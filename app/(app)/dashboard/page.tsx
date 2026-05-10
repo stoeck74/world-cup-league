@@ -30,8 +30,8 @@ export default async function DashboardPage() {
       <div className="max-w-[1400px] mx-auto">
 
         {/* Halos décoratifs */}
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] pointer-events-none -translate-x-1/3 -translate-y-1/3" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-accent/8 rounded-full blur-[140px] pointer-events-none translate-x-1/3 translate-y-1/3" />
+        <div className="absolute top-0 left-0 w-[800px] h-[500px] bg-accent/20 rounded-full blur-[120px] pointer-events-none -translate-x-1/3 -translate-y-1/3" />
+        <div className="absolute bottom-0 right-0 w-[1500px] h-[700px] bg-accent/25 rounded-full blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
 
         {/* Header */}
         <header className="mb-8 relative">
@@ -86,16 +86,16 @@ export default async function DashboardPage() {
           </div>
 
           {/* CARD POSITION */}
-          <div className="lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-8 flex flex-col justify-between min-h-[260px]">
+          <div className="lg:col-span-4 rounded-2xl bg-sky-500/80 border border-sky-500/10 backdrop-blur-xl p-8 flex flex-col justify-between min-h-[260px]">
             <div>
-              <p className="text-xs uppercase tracking-widest text-text-muted mb-3">
+              <p className="text-xs uppercase tracking-widest text-text-accent mb-3">
                 Ma position
               </p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-7xl font-black text-text-primary leading-none">
+              <div className="flex items-baseline ">
+                <span className="text-[7vw] font-black text-primary leading-none">
                   {fakeUser.position}
                 </span>
-                <span className="text-2xl text-text-muted font-bold">e</span>
+                <span className="text-6xl text-primary font-bold">e</span>
               </div>
               <p className="text-sm text-text-secondary mt-2">
                 sur {fakeUser.totalPlayers} joueurs
@@ -105,12 +105,12 @@ export default async function DashboardPage() {
             <div className="pt-4 border-t border-white/5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-text-muted mb-1">Total points</p>
-                  <p className="text-2xl font-bold text-text-primary">
+                  <p className="text-xs text-secondary mb-1">Total points</p>
+                  <p className="text-3xl font-bold text-text-primary">
                     {fakeUser.totalPoints}
                   </p>
                 </div>
-                <div className="flex items-center gap-1.5 text-accent text-sm font-semibold">
+                <div className="flex items-center gap-1.5 text-text-accent text-sm font-semibold">
                   <TrendUp size={16} weight="bold" />
                   +{fakeUser.pointsLastStage}
                 </div>

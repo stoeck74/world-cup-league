@@ -122,8 +122,8 @@ export function MatchsView({
   // ============================================
   // RENDER
   // ============================================
-  return (
-    <div className="p-4 md:p-6 lg:p-8">
+  return ( 
+    <div className="bg-matches p-4 md:p-6 lg:p-8">
       <div className="max-w-[1400px] mx-auto">
 
         {/* HEADER */}

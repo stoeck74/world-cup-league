@@ -2,16 +2,16 @@
 
 @theme {
   /* Palette - Dark theme */
-  --color-bg: #0A0A0A;
+  --color-bg: #f3f3f3;
   --color-bg-elevated: #131313;
   --color-bg-surface: #1A1A1A;
   
   /* Texte */
-  --color-text-primary: #F5F5F5;
-  --color-text-secondary: #9CA3AF;
-  --color-text-muted: #525252;
+  --color-text-primary: #f3f3f3;
+  --color-text-secondary: #ececec;
+  --color-text-muted: #838383; 
   
-  /* Accent rouge */
+  /* Accent bleu */
   --color-accent: #2196f3;
   --color-accent-hover: #304fff;
   --color-accent-muted: #1a247d; 
@@ -35,7 +35,7 @@
 }
 
 /* Base styles */
-html {
+html { 
   background: var(--color-bg);
   color: var(--color-text-primary);
 }
@@ -92,11 +92,11 @@ body {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background-image: url('/login.jpg');
+  background-image: url('/login.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: brightness(0.33) contrast(1.2);
+  filter: brightness(0.4);  
 }
 
 
@@ -114,7 +114,7 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: grayscale(1) brightness(0.30) contrast(1.0);
+  filter: brightness(0.4) contrast(1.0);
 }
 
 .bg-dashboard {
@@ -127,11 +127,11 @@ body {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background-image: url('/dashboard.jpg');
+  background-image: url('/dashboard.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: grayscale(1) brightness(0.3) contrast(1.2);
+  filter:brightness(0.8) contrast(1.1); 
 }
 
 .bg-home {
@@ -148,7 +148,7 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: brightness(0.6) contrast(1); 
+  filter: brightness(0.) contrast(1); 
 }
 
 /* ============================================
@@ -168,6 +168,7 @@ body {
   position: relative;
   isolation: isolate;
   min-height: 100vh;
+  background: #0a0a0a;
 }
 
 .bg-matches::before {
@@ -175,12 +176,15 @@ body {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background-image: url('/matches.jpg');
+  background-image: url('/matches.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: brightness(0.15) contrast(1);
+  height:100vh;
+  filter: brightness(0.4) contrast(1);  
 }
+
+
 
 
 .bg-user {
@@ -188,70 +192,18 @@ body {
   isolation: isolate;
 }
 
-/* ============================================
-   DRAPEAUX / VISUELS NATIONS — Coupe du Monde 2026
-   Format : public/team/{tla}.webp (en lowercase)
-   À fournir : 48 images one-per-nation
-   ============================================ */
-.can::before { background-image: url('/team/can.webp'); }
-.mex::before { background-image: url('/team/mex.webp'); }
-.usa::before { background-image: url('/team/usa.webp'); }
-.fra::before { background-image: url('/team/fra.webp'); }
-.esp::before { background-image: url('/team/esp.webp'); }
-.eng::before { background-image: url('/team/eng.webp'); }
-.ger::before { background-image: url('/team/ger.webp'); }
-.ita::before { background-image: url('/team/ita.webp'); }
-.por::before { background-image: url('/team/por.webp'); }
-.ned::before { background-image: url('/team/ned.webp'); }
-.bel::before { background-image: url('/team/bel.webp'); }
-.cro::before { background-image: url('/team/cro.webp'); }
-.sui::before { background-image: url('/team/sui.webp'); }
-.den::before { background-image: url('/team/den.webp'); }
-.aut::before { background-image: url('/team/aut.webp'); }
-.pol::before { background-image: url('/team/pol.webp'); }
-.cze::before { background-image: url('/team/cze.webp'); }
-.nor::before { background-image: url('/team/nor.webp'); }
-.tur::before { background-image: url('/team/tur.webp'); }
-.sco::before { background-image: url('/team/sco.webp'); }
-.arg::before { background-image: url('/team/arg.webp'); }
-.bra::before { background-image: url('/team/bra.webp'); }
-.uru::before { background-image: url('/team/uru.webp'); }
-.col::before { background-image: url('/team/col.webp'); }
-.ecu::before { background-image: url('/team/ecu.webp'); }
-.par::before { background-image: url('/team/par.webp'); }
-.crc::before { background-image: url('/team/crc.webp'); }
-.pan::before { background-image: url('/team/pan.webp'); }
-.cuw::before { background-image: url('/team/cuw.webp'); }
-.jpn::before { background-image: url('/team/jpn.webp'); }
-.kor::before { background-image: url('/team/kor.webp'); }
-.irn::before { background-image: url('/team/irn.webp'); }
-.aus::before { background-image: url('/team/aus.webp'); }
-.ksa::before { background-image: url('/team/ksa.webp'); }
-.qat::before { background-image: url('/team/qat.webp'); }
-.uzb::before { background-image: url('/team/uzb.webp'); }
-.jor::before { background-image: url('/team/jor.webp'); }
-.mar::before { background-image: url('/team/mar.webp'); }
-.sen::before { background-image: url('/team/sen.webp'); }
-.egy::before { background-image: url('/team/egy.webp'); }
-.tun::before { background-image: url('/team/tun.webp'); }
-.alg::before { background-image: url('/team/alg.webp'); }
-.cmr::before { background-image: url('/team/cmr.webp'); }
-.gha::before { background-image: url('/team/gha.webp'); }
-.rsa::before { background-image: url('/team/rsa.webp'); }
-.cpv::before { background-image: url('/team/cpv.webp'); }
-.nzl::before { background-image: url('/team/nzl.webp'); }
-.bih::before { background-image: url('/team/bih.webp'); }
-.cod::before { background-image: url('/team/cod.webp'); }
+
 
 .bg-user::before {
   content: "";
   position: absolute;
+   background-image: url('/profile.webp');
   inset: 0;
   z-index: -1;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: brightness(0.30) contrast(1);
+  filter: brightness(0.40) contrast(1);
 }
 
 .bg-user::after {
@@ -260,7 +212,7 @@ body {
   inset: 0;
   z-index: -1;
   background: linear-gradient(
-    to right,
+    to top,
     rgba(10, 10, 10, 0.95) 0%,
     rgba(10, 10, 10, 0.7) 40%,
     rgba(10, 10, 10, 0.3) 100%
@@ -270,6 +222,6 @@ body {
   .bg-user::after {
     background: rgba(10, 10, 10, 0.85); /* uniforme */
   }
-}
+} 
 
 
