@@ -1,0 +1,275 @@
+@import "tailwindcss";
+
+@theme {
+  /* Palette - Dark theme */
+  --color-bg: #0A0A0A;
+  --color-bg-elevated: #131313;
+  --color-bg-surface: #1A1A1A;
+  
+  /* Texte */
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #9CA3AF;
+  --color-text-muted: #525252;
+  
+  /* Accent rouge */
+  --color-accent: #2196f3;
+  --color-accent-hover: #304fff;
+  --color-accent-muted: #1a247d; 
+   
+  /* États */
+  --color-danger: #FF5A5F;
+  --color-danger-muted: #7F2D30;
+  --color-success: var(--color-accent);
+  
+  /* Bordures */
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  
+  /* Glass effect */
+  --color-glass: rgba(255, 255, 255, 0.04);
+  --color-glass-strong: rgba(255, 255, 255, 0.08);
+  
+  /* Fontes (référencent les CSS variables injectées par next/font) */
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
+}
+
+/* Base styles */
+html {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Selection */
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* Scrollbar custom (subtil) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-muted);
+}
+
+/* Filtre image automatique pour photos N&B désaturées */
+.photo-treated {
+  filter: grayscale(1) brightness(0.55) contrast(1.1);
+  mix-blend-mode: luminosity;
+}
+
+/* Glassmorph utility (pour l'instant, on verra si on en fait une classe Tailwind plus tard) */
+
+/* Gradient subtil pour les hero / backgrounds */
+
+
+.bg-login {
+  position: relative;
+  isolation: isolate;
+}
+
+.bg-login::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/login.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(0.33) contrast(1.2);
+}
+
+
+.bg-register {
+  position: relative;
+  isolation: isolate;
+}
+
+.bg-register::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/register.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: grayscale(1) brightness(0.30) contrast(1.0);
+}
+
+.bg-dashboard {
+  position: relative;
+  isolation: isolate;
+}
+
+.bg-dashboard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/dashboard.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: grayscale(1) brightness(0.3) contrast(1.2);
+}
+
+.bg-home {
+  position: relative;
+  isolation: isolate;
+}
+
+.bg-home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/home.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(0.6) contrast(1); 
+}
+
+/* ============================================
+   SCROLLBAR HIDE
+   Pour les zones scrollables sans barre visible
+   ============================================ */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+
+.bg-matches {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+}
+
+.bg-matches::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/matches.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(0.15) contrast(1);
+}
+
+
+.bg-user {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ============================================
+   DRAPEAUX / VISUELS NATIONS — Coupe du Monde 2026
+   Format : public/team/{tla}.webp (en lowercase)
+   À fournir : 48 images one-per-nation
+   ============================================ */
+.can::before { background-image: url('/team/can.webp'); }
+.mex::before { background-image: url('/team/mex.webp'); }
+.usa::before { background-image: url('/team/usa.webp'); }
+.fra::before { background-image: url('/team/fra.webp'); }
+.esp::before { background-image: url('/team/esp.webp'); }
+.eng::before { background-image: url('/team/eng.webp'); }
+.ger::before { background-image: url('/team/ger.webp'); }
+.ita::before { background-image: url('/team/ita.webp'); }
+.por::before { background-image: url('/team/por.webp'); }
+.ned::before { background-image: url('/team/ned.webp'); }
+.bel::before { background-image: url('/team/bel.webp'); }
+.cro::before { background-image: url('/team/cro.webp'); }
+.sui::before { background-image: url('/team/sui.webp'); }
+.den::before { background-image: url('/team/den.webp'); }
+.aut::before { background-image: url('/team/aut.webp'); }
+.pol::before { background-image: url('/team/pol.webp'); }
+.cze::before { background-image: url('/team/cze.webp'); }
+.nor::before { background-image: url('/team/nor.webp'); }
+.tur::before { background-image: url('/team/tur.webp'); }
+.sco::before { background-image: url('/team/sco.webp'); }
+.arg::before { background-image: url('/team/arg.webp'); }
+.bra::before { background-image: url('/team/bra.webp'); }
+.uru::before { background-image: url('/team/uru.webp'); }
+.col::before { background-image: url('/team/col.webp'); }
+.ecu::before { background-image: url('/team/ecu.webp'); }
+.par::before { background-image: url('/team/par.webp'); }
+.crc::before { background-image: url('/team/crc.webp'); }
+.pan::before { background-image: url('/team/pan.webp'); }
+.cuw::before { background-image: url('/team/cuw.webp'); }
+.jpn::before { background-image: url('/team/jpn.webp'); }
+.kor::before { background-image: url('/team/kor.webp'); }
+.irn::before { background-image: url('/team/irn.webp'); }
+.aus::before { background-image: url('/team/aus.webp'); }
+.ksa::before { background-image: url('/team/ksa.webp'); }
+.qat::before { background-image: url('/team/qat.webp'); }
+.uzb::before { background-image: url('/team/uzb.webp'); }
+.jor::before { background-image: url('/team/jor.webp'); }
+.mar::before { background-image: url('/team/mar.webp'); }
+.sen::before { background-image: url('/team/sen.webp'); }
+.egy::before { background-image: url('/team/egy.webp'); }
+.tun::before { background-image: url('/team/tun.webp'); }
+.alg::before { background-image: url('/team/alg.webp'); }
+.cmr::before { background-image: url('/team/cmr.webp'); }
+.gha::before { background-image: url('/team/gha.webp'); }
+.rsa::before { background-image: url('/team/rsa.webp'); }
+.cpv::before { background-image: url('/team/cpv.webp'); }
+.nzl::before { background-image: url('/team/nzl.webp'); }
+.bih::before { background-image: url('/team/bih.webp'); }
+.cod::before { background-image: url('/team/cod.webp'); }
+
+.bg-user::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(0.30) contrast(1);
+}
+
+.bg-user::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to right,
+    rgba(10, 10, 10, 0.95) 0%,
+    rgba(10, 10, 10, 0.7) 40%,
+    rgba(10, 10, 10, 0.3) 100%
+  );
+}
+@media (max-width: 768px) {
+  .bg-user::after {
+    background: rgba(10, 10, 10, 0.85); /* uniforme */
+  }
+}
+
+

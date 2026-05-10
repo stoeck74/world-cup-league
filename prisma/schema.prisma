@@ -1,0 +1,229 @@
+// World Cup League - Database Schema
+// Documentation : https://pris.ly/d/prisma-schema
+//
+// Adapté depuis Panenka League (Ligue 1) pour la Coupe du Monde 2026.
+// Différences clés :
+//  - Pas de Banco
+//  - Match.stage : phase du tournoi (GROUP | ROUND_32 | ROUND_16 | QUARTER | SEMI | THIRD_PLACE | FINAL)
+//  - Match.group : nom du groupe (A → L) pour la phase de poules
+//  - Pour les KO : champs extraTime, penalties, qualifierTeam
+//  - Prediction.qualifierTeamId : prono "qui passe" en KO
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum MatchStage {
+  GROUP        // phase de poules
+  ROUND_32     // 1/16e
+  ROUND_16     // 1/8e
+  QUARTER      // 1/4 de finale
+  SEMI         // 1/2 finale
+  THIRD_PLACE  // petite finale
+  FINAL        // finale
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+  POSTPONED
+}
+
+// ============================================
+// USER & AUTH
+// ============================================
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  username        String   @unique
+  password        String
+  name            String?
+  avatar          String?
+  avatarSeed      String?
+  avatarStyle     String?  // "toon-head" ou "personas"
+  bio             String?
+  favoriteTeamId  String?
+  favoritePlayer  String?
+  role            UserRole @default(USER)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  favoriteTeam       Team?            @relation(fields: [favoriteTeamId], references: [id])
+  predictions        Prediction[]
+  invitationsCreated InvitationCode[]
+  accounts           Account[]
+  sessions           Session[]
+}
+
+model InvitationCode {
+  id          String   @id @default(cuid())
+  code        String   @unique // ex: "WCL-2026-XXXX"
+
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  usedById    String?  @unique
+  usedAt      DateTime?
+
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+}
+
+// ============================================
+// TOURNAMENT & TEAM
+// ============================================
+
+model Tournament {
+  id          String   @id @default(cuid())
+  name        String   // ex: "FIFA World Cup 2026"
+  externalId  Int?     @unique // ID football-data (compétition WC = 2000)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  matches     Match[]
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  externalId  Int      @unique
+  name        String
+  shortName   String
+  tla         String
+  crestUrl    String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  homeMatches      Match[]    @relation("HomeTeam")
+  awayMatches      Match[]    @relation("AwayTeam")
+  qualifiedMatches Match[]    @relation("QualifierTeam")
+  fans             User[]
+}
+
+// ============================================
+// MATCH
+// ============================================
+
+model Match {
+  id            String       @id @default(cuid())
+  externalId    Int          @unique
+  tournamentId  String
+
+  stage         MatchStage
+  group         String?      // "A" → "L" en phase de poules
+
+  homeTeamId    String?      // null si qualifiés inconnus (KO)
+  awayTeamId    String?      // null si qualifiés inconnus (KO)
+
+  kickoffAt     DateTime
+  status        MatchStatus  @default(SCHEDULED)
+
+  // Score à 90 min
+  homeScore     Int?
+  awayScore     Int?
+
+  // Score après prolongations (KO uniquement)
+  homeExtraTime Int?
+  awayExtraTime Int?
+
+  // Tirs au but (KO uniquement)
+  homePenalties Int?
+  awayPenalties Int?
+
+  // Équipe qui s'est qualifiée (KO uniquement)
+  qualifierTeamId String?
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  homeTeam        Team?      @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam        Team?      @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  qualifierTeam   Team?      @relation("QualifierTeam", fields: [qualifierTeamId], references: [id])
+  predictions     Prediction[]
+}
+
+// ============================================
+// PREDICTION
+// ============================================
+
+model Prediction {
+  id              String   @id @default(cuid())
+  userId          String
+  matchId         String
+
+  homeScore       Int      // score domicile prédit (90 min)
+  awayScore       Int      // score extérieur prédit (90 min)
+
+  // KO uniquement : quelle équipe va passer
+  qualifierTeamId String?
+
+  pointsEarned    Int?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match           Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId])
+}
+
+// ============================================
+// AUTH.JS TABLES
+// ============================================
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
