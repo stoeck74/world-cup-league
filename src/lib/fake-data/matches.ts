@@ -554,41 +554,49 @@ export const fakeGroupMatches: FakeMatchDetailed[] = [
 ]
 
 // ============================================
-// ROUND OF 32 — placeholder (équipes à déterminer)
+// ROUND OF 32 — 16 matchs (CDM 2026)
+// Équipes à déterminer (Placeholders)
 // ============================================
-export const fakeRound32Matches: FakeMatchDetailed[] = []
+export const fakeRound32Matches: FakeMatchDetailed[] = [
+  {
+    id: "r32-01", stage: "ROUND_32",
+    homeTeam: t("1er Groupe A", "1A"), awayTeam: t("3e Groupe C/D/E", "3CDE"),
+    kickoffDate: "Lundi 29 juin", kickoffTime: "21:00",
+    venue: "SoFi Stadium, Inglewood", status: "scheduled",
+  },
+  {
+    id: "r32-02", stage: "ROUND_32",
+    homeTeam: t("1er Groupe E", "1E"), awayTeam: t("3e Groupe A/B/C", "3ABC"),
+    kickoffDate: "Mardi 30 juin", kickoffTime: "00:00",
+    venue: "MetLife Stadium, East Rutherford", status: "scheduled",
+  },
+  {
+    id: "r32-03", stage: "ROUND_32",
+    homeTeam: t("1er Groupe I", "1I"), awayTeam: t("3e Groupe F/G/H", "3FGH"),
+    kickoffDate: "Mardi 30 juin", kickoffTime: "21:00",
+    venue: "Estadio Azteca, Mexico", status: "scheduled",
+  },
+  {
+    id: "r32-04", stage: "ROUND_32",
+    homeTeam: t("2e Groupe A", "2A"), awayTeam: t("2e Groupe B", "2B"),
+    kickoffDate: "Mercredi 1 juillet", kickoffTime: "00:00",
+    venue: "Levi's Stadium, Santa Clara", status: "scheduled",
+  },
+  // Tu peux ajouter les 12 autres matchs sur ce modèle plus tard
+];
 
 // ============================================
-// HELPERS
+// FIN DU FICHIER : HELPERS & CONSTANTES
 // ============================================
-export function getMatchesByStage(stage: FakeStage): FakeMatchDetailed[] {
-  switch (stage) {
-    case "GROUP":
-      return fakeGroupMatches
-    case "ROUND_32":
-      return fakeRound32Matches
-    default:
-      return []
-  }
-}
 
-// Récupérer les matchs d'un groupe spécifique
-export function getMatchesByGroup(group: string): FakeMatchDetailed[] {
-  return fakeGroupMatches.filter((m) => m.group === group)
-}
+export const fakeGroupLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 
-// Liste des 12 groupes
-export const fakeGroupLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
-
-// ============================================
-// LISTE DES PHASES
-// ============================================
 export type FakeStageInfo = {
-  key: FakeStage
-  label: string
-  status: "past" | "current" | "future"
-  matchesCount: number
-}
+  key: FakeStage;
+  label: string;
+  status: "past" | "current" | "future";
+  matchesCount: number;
+};
 
 export const fakeStages: FakeStageInfo[] = [
   { key: "GROUP", label: "Phase de poules", status: "current", matchesCount: 72 },
@@ -598,4 +606,15 @@ export const fakeStages: FakeStageInfo[] = [
   { key: "SEMI", label: "Demi-finales", status: "future", matchesCount: 2 },
   { key: "THIRD_PLACE", label: "Petite finale", status: "future", matchesCount: 1 },
   { key: "FINAL", label: "Finale", status: "future", matchesCount: 1 },
-]
+];
+
+export function getMatchesByStage(stage: FakeStage): FakeMatchDetailed[] {
+  switch (stage) {
+    case "GROUP":
+      return fakeGroupMatches;
+    case "ROUND_32":
+      return fakeRound32Matches; // Assure-toi que ce tableau existe ou est déclaré []
+    default:
+      return [];
+  }
+}

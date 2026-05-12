@@ -86,7 +86,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* CARD POSITION */}
-          <div className="lg:col-span-4 rounded-2xl bg-sky-500/80 border border-sky-500/10 backdrop-blur-xl p-8 flex flex-col justify-between min-h-[260px]">
+          <div className="lg:col-span-4 rounded-2xl bg-accent border border-accent/10 backdrop-blur-xl p-8 flex flex-col justify-between min-h-[260px]">
             <div>
               <p className="text-xs uppercase tracking-widest text-text-accent mb-3">
                 Ma position

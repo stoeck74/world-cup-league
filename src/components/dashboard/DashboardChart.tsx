@@ -116,8 +116,8 @@ function CustomTooltip({ active, payload, trend }: TooltipProps) {
       </p>
       <p className="text-2xl font-bold text-accent">
         {trend.key === "position" ? `${value}e` : value}
-        {trend.key === "points" && <span className="text-base text-text-muted ml-1">pts</span>}
-        {trend.key === "cumulative" && <span className="text-base text-text-muted ml-1">pts</span>}
+        {trend.key === "points" && <span className="text-base text-primary ml-1">pts</span>}
+        {trend.key === "cumulative" && <span className="text-base text-primary ml-1">pts</span>}
       </p>
     </div>
   )
@@ -137,7 +137,7 @@ export function DashboardChart() {
       {/* Header avec switcher */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
         <div>
-          <p className="text-xs uppercase tracking-widest text-text-muted mb-2">
+          <p className="text-xs uppercase tracking-widest text-text-primary mb-2">
             Évolution sur la saison
           </p>
           <h2 className="text-2xl font-bold text-text-primary">
@@ -170,16 +170,16 @@ export function DashboardChart() {
         <ResponsiveContainer width="100%" height="100%">
           {trend.type === "bar" ? (
             <BarChart data={fakeChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" vertical={false} />
               <XAxis
                 dataKey="matchday"
-                stroke="#525252"
+                stroke="#f3f3f3"
                 tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                stroke="#525252"
+                stroke="#f3f3f3"
                 tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
@@ -196,13 +196,13 @@ export function DashboardChart() {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis
                 dataKey="matchday"
-                stroke="#525252"
+                stroke="#f3f3f3"
                 tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                stroke="#525252"
+                stroke="#f3f3f3"
                 tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
@@ -229,13 +229,13 @@ export function DashboardChart() {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis
                 dataKey="matchday"
-                stroke="#525252"
+                stroke="#f3f3f3"
                 tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                stroke="#525252"
+                stroke="#f3f3f3"
                 tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
