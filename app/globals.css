@@ -165,7 +165,7 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   height:100vh;
-  filter: brightness(0.4) contrast(1);  
+  filter: brightness(0.3) contrast(1);   
 }
 .bg-matches::after {
   content: "";
@@ -263,7 +263,7 @@ background: linear-gradient(
   position: relative;
   isolation: isolate;
   min-height: 100vh;
-  background: #0a0a0a;
+  background: #0a0a0a; 
 }
 
 .bg-players::before {
@@ -378,6 +378,40 @@ background: linear-gradient(
     rgba(10, 10, 10, 0.5) 40%, 
     #0a0a0a 100%
   );
-  pointer-events: none;
 }
 
+.bg-results {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background: #0a0a0a; 
+}
+
+.bg-results::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/results.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height:100vh;
+  filter: brightness(0.4) contrast(1);  
+}
+
+.bg-results::after {
+  content: "";
+  position: absolute; 
+  bottom: 0; /* On le colle en bas */
+  left: 0;
+  right: 0;
+  height: 200px; /* Ta hauteur souhaitée */
+  z-index: 10; /* Doit être au-dessus de l'image (z-0) */
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(10, 10, 10, 0.5) 40%, 
+    #0a0a0a 100%  
+  );
+}

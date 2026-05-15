@@ -39,7 +39,7 @@ export function GroupStage({ groups }: GroupStageProps) {
   return (
     <div
       ref={containerRef}
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 bg-red-400"
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
     >
       {groups.map((group) => (
         <GroupCard key={group.letter} group={group} />
@@ -56,15 +56,15 @@ function GroupCard({ group }: { group: FakeGroup }) {
   return (
     <div
       data-group-card
-      className="rounded-2xl bg-white border border-white/10 backdrop-blur-xl p-4 md:p-5"
+      className="rounded-2xl bg-gradient-to-br from-indigo-500/20 to-blue-500/40 backdrop-blur-xl p-4 md:p-5" 
     >
       {/* Header : lettre du groupe */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <span className="text-xs uppercase tracking-widest text-text-muted">
+          <span className="text-sm tracking-tight text-text-muted">
             Groupe
           </span>
-          <span className="text-lg font-black text-accent">
+          <span className="text-2xl font-black text-accent">
             {group.letter}
           </span>
         </div>

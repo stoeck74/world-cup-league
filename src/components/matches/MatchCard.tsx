@@ -90,9 +90,9 @@ export function MatchCard({
       {(isSaved || justSaved) && (
         <div
           className={`
-            pointer-events-none absolute bottom-0 left-0 right-0 h-24
-            bg-gradient-to-t from-sky-900/50 via-sky-500/30 to-transparent
-            border-b border-sky-900
+            pointer-events-none absolute bottom-0 left-0 right-0 h-48
+            bg-gradient-to-t from-blue-500/33 to-transparent
+        
             transition-opacity duration-500
             ${justSaved ? "opacity-100" : "opacity-70"}
           `}

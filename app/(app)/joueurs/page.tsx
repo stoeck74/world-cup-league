@@ -9,6 +9,7 @@ export default async function JoueursPage() {
   // Récupère tous les joueurs avec leur équipe favorite
   const players = await prisma.user.findMany({
     orderBy: { username: "asc" },
+    where: { role: "USER" },
     select: {
       username: true,
       avatarStyle: true,

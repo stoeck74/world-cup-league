@@ -1,30 +1,44 @@
 import { auth } from "@/../auth"
-import {
-  fakeUser,
-  fakeCurrentStage,
-  fakeUpcomingMatches,
-  fakeLeaderboardTop,
-  fakeLastResults,
-} from "@/lib/fake-data/dashboard"
 import { ArrowRight, TrendUp, Trophy } from "@phosphor-icons/react/dist/ssr"
 import Link from "next/link"
 import { DashboardChart } from "@/components/dashboard/DashboardChart"
-
-// ============================================
-// DASHBOARD — Coupe du Monde 2026
-// ============================================
-// Différences clés vs Panenka League / Ligue 1 :
-//  - "Prochaine journée" devient "Phase en cours" (poules / 1/16e / etc.)
-//  - Pas de banco
-//  - Le DashboardChart hérité de Ligue 1 reste à adapter en V2
-//    (actuellement il garde les 38 journées en placeholder, à remplacer par
-//     une visualisation phase de poules + KO)
-// ============================================
+import {
+  getCurrentStage,
+  getUserStats,
+  getUserPosition,
+  getUpcomingMatches,
+  getLeaderboardTop,
+  getMyLastResults,
+  getPointsLastStage,
+  getChartData,
+} from "@/lib/dashboard-data"
 
 export default async function DashboardPage() {
   const session = await auth()
   if (!session) return null
 
+  const userId = session.user.id
+
+  // Charge toutes les données en parallèle (plus rapide)
+const [
+    currentStage,
+    stats,
+    position,
+    upcomingMatches,
+    leaderboardTop,
+    lastResults,
+    pointsLastStage,
+    chartData,
+  ] = await Promise.all([
+    getCurrentStage(userId),
+    getUserStats(userId),
+    getUserPosition(userId),
+    getUpcomingMatches(4, userId),
+    getLeaderboardTop(userId, 5),
+    getMyLastResults(userId, 5),
+    getPointsLastStage(userId),
+    getChartData(userId),
+  ])
   return (
     <div className="relative bg-dashboard h-full p-4 md:p-6 lg:p-8 overflow-hidden">
       <div className="max-w-[1400px] mx-auto">
@@ -42,36 +56,93 @@ export default async function DashboardPage() {
             Bonjour <span className="text-accent">{session.user.username}</span>
           </h1>
           <p className="text-text-secondary mt-1">
-            {fakeCurrentStage.label} · {fakeCurrentStage.startDate}
+            {currentStage.label}
+            {currentStage.startDate && ` · ${currentStage.startDate}`}
           </p>
         </header>
 
         {/* Ligne 1 — Hero (phase actuelle) + Position */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative">
 
-          {/* HERO CARD — Phase en cours */}
-          <div className="lg:col-span-8 relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-8 min-h-[260px] flex flex-col justify-between">
+{/* HERO CARD — Phase en cours + 3 prochains matchs */}
+          <div className="lg:col-span-8 relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-8 flex flex-col justify-between gap-6">
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* TITRE */}
             <div className="relative">
               <p className="text-xs uppercase tracking-widest text-accent mb-3 flex items-center gap-2">
                 <Trophy size={14} weight="fill" />
                 Phase en cours
               </p>
               <h2 className="text-4xl md:text-5xl font-black text-text-primary leading-tight mb-2">
-                {fakeCurrentStage.label}
+                {currentStage.label}
               </h2>
-              <p className="text-text-secondary text-lg">
-                {fakeCurrentStage.startDate} · coup d&apos;envoi {fakeCurrentStage.startTime}
-              </p>
+              {currentStage.startDate && (
+                <p className="text-text-secondary text-lg">
+                  {currentStage.startDate} · coup d&apos;envoi {currentStage.startTime}
+                </p>
+              )}
             </div>
 
-            <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mt-6">
+{/* 3 PROCHAINS MATCHS */}
+            {upcomingMatches.length > 0 && (
+              <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {upcomingMatches.slice(0, 3).map((match) => {
+                  const hasPrediction =
+                    match.myHomePrediction !== null && match.myAwayPrediction !== null
+                  return (
+                    <div
+                      key={match.id}
+                      className={`
+                        rounded-xl border p-4 transition-colors
+                        ${hasPrediction
+                          ? "bg-accent/10 border-accent/30"
+                          : "bg-black/30 border-white/10"
+                        }
+                      `}
+                    >
+                      <p className="text-[10px] uppercase tracking-widest text-text-muted mb-3">
+                        {match.kickoffDate} · {match.kickoffTime}
+                      </p>
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <span className="text-sm font-bold text-text-primary truncate">
+                          {match.homeTeamTla}
+                        </span>
+                        <span className="text-xs text-text-muted">vs</span>
+                        <span className="text-sm font-bold text-text-primary truncate">
+                          {match.awayTeamTla}
+                        </span>
+                      </div>
+
+                      {/* Prono */}
+                      <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                        <span className="text-[10px] uppercase tracking-widest text-text-muted">
+                          Mon prono
+                        </span>
+                        {hasPrediction ? (
+                          <span className="text-sm font-bold text-accent tabular-nums">
+                            {match.myHomePrediction} - {match.myAwayPrediction}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-text-muted italic">
+                            À faire
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* FOOTER — Pronostics + bouton */}
+            <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div>
                 <p className="text-xs text-text-muted mb-1">Pronostics</p>
                 <p className="text-2xl font-bold text-text-primary">
-                  {fakeCurrentStage.predictionsMade}
+                  {currentStage.predictionsMade}
                   <span className="text-text-muted text-lg font-normal">
-                    {" / "}{fakeCurrentStage.matchesCount} matchs
+                    {" / "}{currentStage.matchesCount} matchs
                   </span>
                 </p>
               </div>
@@ -91,14 +162,14 @@ export default async function DashboardPage() {
               <p className="text-xs uppercase tracking-widest text-text-accent mb-3">
                 Ma position
               </p>
-              <div className="flex items-baseline ">
+              <div className="flex items-baseline">
                 <span className="text-[7vw] font-black text-primary leading-none">
-                  {fakeUser.position}
+                  {position.position}
                 </span>
                 <span className="text-6xl text-primary font-bold">e</span>
               </div>
               <p className="text-sm text-text-secondary mt-2">
-                sur {fakeUser.totalPlayers} joueurs
+                sur {position.totalPlayers} joueur{position.totalPlayers > 1 ? "s" : ""}
               </p>
             </div>
 
@@ -107,13 +178,15 @@ export default async function DashboardPage() {
                 <div>
                   <p className="text-xs text-secondary mb-1">Total points</p>
                   <p className="text-3xl font-bold text-text-primary">
-                    {fakeUser.totalPoints}
+                    {position.points}
                   </p>
                 </div>
-                <div className="flex items-center gap-1.5 text-text-accent text-sm font-semibold">
-                  <TrendUp size={16} weight="bold" />
-                  +{fakeUser.pointsLastStage}
-                </div>
+                {pointsLastStage > 0 && (
+                  <div className="flex items-center gap-1.5 text-text-accent text-sm font-semibold">
+                    <TrendUp size={16} weight="bold" />
+                    +{pointsLastStage}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -125,7 +198,7 @@ export default async function DashboardPage() {
 
           {/* GRAPH (à adapter en V2 pour la CDM) */}
           <div className="lg:col-span-6 min-w-0">
-            <DashboardChart />
+            <DashboardChart data={chartData} />
           </div>
 
           {/* MES STATS */}
@@ -145,7 +218,7 @@ export default async function DashboardPage() {
                   Total points
                 </p>
                 <p className="text-3xl font-black text-text-primary">
-                  {fakeUser.totalPoints}
+                  {stats.totalPoints}
                 </p>
               </div>
 
@@ -154,7 +227,7 @@ export default async function DashboardPage() {
                   Réussite
                 </p>
                 <p className="text-3xl font-black text-accent">
-                  {fakeUser.successRate}<span className="text-xl">%</span>
+                  {stats.successRate}<span className="text-xl">%</span>
                 </p>
               </div>
 
@@ -163,7 +236,7 @@ export default async function DashboardPage() {
                   Scores exacts
                 </p>
                 <p className="text-3xl font-black text-text-primary">
-                  {fakeUser.exactScores}
+                  {stats.exactScores}
                 </p>
               </div>
 
@@ -172,7 +245,7 @@ export default async function DashboardPage() {
                   Bons résultats
                 </p>
                 <p className="text-3xl font-black text-text-primary">
-                  {fakeUser.goodResults}
+                  {stats.goodResults}
                 </p>
               </div>
             </div>
@@ -204,37 +277,39 @@ export default async function DashboardPage() {
             </div>
 
             <div className="space-y-3">
-              {fakeUpcomingMatches.slice(0, 4).map((match) => (
-                <div
-                  key={match.id}
-                  className="flex items-center justify-between py-3 border-b border-white/5 last:border-b-0"
-                >
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="text-xs font-bold uppercase tracking-widest text-text-muted shrink-0 w-10">
-                      {match.homeTeamTla}
-                    </span>
-                    <span className="text-sm font-medium text-text-primary truncate">
-                      {match.homeTeamName}
-                    </span>
-                  </div>
+              {upcomingMatches.length === 0 ? (
+                <p className="text-sm text-text-muted text-center py-4">
+                  Aucun match à venir
+                </p>
+              ) : (
+                upcomingMatches.map((match) => (
+                  <div
+                    key={match.id}
+                    className="flex items-center justify-center py-3 border-b border-white/5 last:border-b-0"
+                  >
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
 
-                  <div className="px-2 text-xs text-text-muted">vs</div>
+                      <span className="text-sm font-medium text-text-primary truncate">
+                        {match.homeTeamName}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-                    <span className="text-sm font-medium text-text-primary truncate text-right">
-                      {match.awayTeamName}
-                    </span>
-                    <span className="text-xs font-bold uppercase tracking-widest text-text-muted shrink-0 w-10 text-right">
-                      {match.awayTeamTla}
-                    </span>
-                  </div>
+                    <div className="px-2 text-xs text-text-muted">vs</div>
 
-                  <div className="ml-3 text-xs text-text-muted text-right shrink-0 hidden sm:block">
-                    <p>{match.kickoffDate.split(" ")[0]}</p>
-                    <p className="text-text-secondary font-medium">{match.kickoffTime}</p>
+                    <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
+                      <span className="text-sm font-medium text-text-primary truncate text-right">
+                        {match.awayTeamName}
+                      </span>
+
+                    </div>
+
+                    <div className="ml-3 text-xs text-text-muted text-right shrink-0 hidden sm:block">
+                      <p>{match.kickoffDate.split(" ")[0]}</p>
+                      <p className="text-text-secondary font-medium">{match.kickoffTime}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -259,49 +334,55 @@ export default async function DashboardPage() {
             </div>
 
             <div className="space-y-2">
-              {fakeLeaderboardTop.map((player) => (
-                <div
-                  key={player.position}
-                  className={`
-                    flex items-center gap-4 px-3 py-2.5 rounded-lg transition-colors
-                    ${player.isMe
-                      ? "bg-accent/10 border border-accent/20"
-                      : "hover:bg-white/[0.02]"
-                    }
-                  `}
-                >
-                  <span className={`
-                    text-sm font-bold w-6 shrink-0
-                    ${player.isMe ? "text-accent" : "text-text-muted"}
-                  `}>
-                    {player.position}.
-                  </span>
+              {leaderboardTop.length === 0 ? (
+                <p className="text-sm text-text-muted text-center py-4">
+                  Aucun joueur encore
+                </p>
+              ) : (
+                leaderboardTop.map((player) => (
+                  <div
+                    key={player.position}
+                    className={`
+                      flex items-center gap-4 px-3 py-2.5 rounded-lg transition-colors
+                      ${player.isMe
+                        ? "bg-accent/10 border border-accent/20"
+                        : "hover:bg-white/[0.02]"
+                      }
+                    `}
+                  >
+                    <span className={`
+                      text-sm font-bold w-6 shrink-0
+                      ${player.isMe ? "text-accent" : "text-text-muted"}
+                    `}>
+                      {player.position}.
+                    </span>
 
-                  <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                    <span className="text-xs font-bold uppercase text-text-secondary">
-                      {player.username[0]}
+                    <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                      <span className="text-xs font-bold uppercase text-text-secondary">
+                        {player.username[0]}
+                      </span>
+                    </div>
+
+                    <span className={`
+                      flex-1 text-sm font-medium truncate
+                      ${player.isMe ? "text-text-primary" : "text-text-secondary"}
+                    `}>
+                      {player.username}
+                      {player.isMe && (
+                        <span className="text-accent ml-2 text-xs">●</span>
+                      )}
+                    </span>
+
+                    <span className={`
+                      text-sm font-bold shrink-0
+                      ${player.isMe ? "text-accent" : "text-text-primary"}
+                    `}>
+                      {player.points}
+                      <span className="text-text-muted text-xs font-normal ml-1">pts</span>
                     </span>
                   </div>
-
-                  <span className={`
-                    flex-1 text-sm font-medium truncate
-                    ${player.isMe ? "text-text-primary" : "text-text-secondary"}
-                  `}>
-                    {player.username}
-                    {player.isMe && (
-                      <span className="text-accent ml-2 text-xs">●</span>
-                    )}
-                  </span>
-
-                  <span className={`
-                    text-sm font-bold shrink-0
-                    ${player.isMe ? "text-accent" : "text-text-primary"}
-                  `}>
-                    {player.points}
-                    <span className="text-text-muted text-xs font-normal ml-1">pts</span>
-                  </span>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -310,54 +391,62 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
-                  {fakeCurrentStage.label}
+                  {currentStage.label}
                 </p>
                 <h3 className="text-xl font-bold text-text-primary">
                   Mes derniers résultats
                 </h3>
               </div>
-              <div className="text-right">
-                <p className="text-xs text-text-muted">Cette phase</p>
-                <p className="text-xl font-bold text-accent">
-                  +{fakeUser.pointsLastStage}
-                </p>
-              </div>
+              {pointsLastStage > 0 && (
+                <div className="text-right">
+                  <p className="text-xs text-text-muted">Récent</p>
+                  <p className="text-xl font-bold text-accent">
+                    +{pointsLastStage}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="space-y-3">
-              {fakeLastResults.map((result, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-3 py-3 border-b border-white/5 last:border-b-0"
-                >
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="text-xs font-bold uppercase text-text-muted shrink-0 w-10">
-                      {result.homeTeamTla}
-                    </span>
-                    <span className="text-sm font-medium text-text-primary">
-                      {result.homeScore}
-                    </span>
-                    <span className="text-text-muted">-</span>
-                    <span className="text-sm font-medium text-text-primary">
-                      {result.awayScore}
-                    </span>
-                    <span className="text-xs font-bold uppercase text-text-muted shrink-0 w-10">
-                      {result.awayTeamTla}
-                    </span>
-                  </div>
+              {lastResults.length === 0 ? (
+                <p className="text-sm text-text-muted text-center py-4">
+                  Aucun résultat pour l&apos;instant
+                </p>
+              ) : (
+                lastResults.map((result, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-3 py-3 border-b border-white/5 last:border-b-0"
+                  >
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <span className="text-xs font-bold uppercase text-text-muted shrink-0 w-10">
+                        {result.homeTeamTla}
+                      </span>
+                      <span className="text-sm font-medium text-text-primary">
+                        {result.homeScore}
+                      </span>
+                      <span className="text-text-muted">-</span>
+                      <span className="text-sm font-medium text-text-primary">
+                        {result.awayScore}
+                      </span>
+                      <span className="text-xs font-bold uppercase text-text-muted shrink-0 w-10">
+                        {result.awayTeamTla}
+                      </span>
+                    </div>
 
-                  <div className="text-xs text-text-muted">
-                    prono <span className="text-text-secondary font-medium">{result.myHomePrediction}-{result.myAwayPrediction}</span>
-                  </div>
+                    <div className="text-xs text-text-muted">
+                      prono <span className="text-text-secondary font-medium">{result.myHomePrediction}-{result.myAwayPrediction}</span>
+                    </div>
 
-                  <div className={`
-                    text-sm font-bold w-12 text-right shrink-0
-                    ${result.myPoints > 0 ? "text-accent" : "text-text-muted"}
-                  `}>
-                    {result.myPoints > 0 ? `+${result.myPoints}` : "0"}
+                    <div className={`
+                      text-sm font-bold w-12 text-right shrink-0
+                      ${result.myPoints > 0 ? "text-accent" : "text-text-muted"}
+                    `}>
+                      {result.myPoints > 0 ? `+${result.myPoints}` : "0"}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 

@@ -30,7 +30,7 @@ export function ProfileFavoritePlayer({ initialValue, isOwnProfile }: Props) {
       className={`group flex items-center justify-between py-4 border-b border-white/10 -mx-2 px-2 rounded-lg transition-colors ${!isEditing ? "cursor-pointer hover:bg-white/[0.02]" : ""}`}
     >
       <p className="text-xs uppercase tracking-widest text-text-muted">
-        Joueur favori
+        Meilleur joueur du tournoi
       </p>
       <EditableField
         initialValue={initialValue}

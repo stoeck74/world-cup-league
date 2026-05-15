@@ -91,7 +91,7 @@ export default async function AidePage() {
             <ScoreRow
               points={0}
               label="Mauvais résultat"
-              description="Tu as prédit une victoire mais c'est l'inverse, ou tu as prédit un nul et il y a un vainqueur."
+              description="Tu as tout faux ! Ni le vainqueur, ni le score. Zéro point."
               variant="zero"
             />
             <ScoreRow

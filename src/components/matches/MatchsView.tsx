@@ -32,13 +32,12 @@ export function MatchsView({
   const [mainTab, setMainTab] = useState<MainTab>(
     currentStage === "GROUP" ? "POULES" : "FINALE"
   )
-  const [selectedGroup, setSelectedGroup] = useState<string>("ALL")
+  const [selectedGroup, setSelectedGroup] = useState<string>("A")
 
   // Matchs filtrés par groupe
   const displayedMatches = useMemo(() => {
     if (mainTab !== "POULES") return []
-    if (selectedGroup === "ALL") return matches
-    return matches.filter((m) => m.group === selectedGroup)
+    return matches.filter((m) => m.stage === "GROUP" && m.group === selectedGroup)
   }, [matches, mainTab, selectedGroup])
 
   // ============================================
@@ -166,11 +165,11 @@ export function MatchsView({
     <div className="p-4 md:p-6 lg:p-8 bg-matches">
       <div className="w-full mx-auto">
 
-        <header ref={headerRef} className="mb-8">
+        <header ref={headerRef} className="mb-8 ">
           <p className="text-xs uppercase tracking-widest text-text-muted mb-2">
             Pronostics
           </p>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 ">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-text-primary">
                 {mainTab === "POULES" ? (
@@ -187,7 +186,7 @@ export function MatchsView({
             </div>
 
             {mainTab === "POULES" && (
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-6 ">
                 <div>
                   <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
                     Pronos
@@ -236,19 +235,6 @@ export function MatchsView({
         {mainTab === "POULES" && (
           <div className="mb-8 -mx-4 md:mx-0">
             <div className="flex gap-2 overflow-x-auto pb-2 px-4 md:px-0 scrollbar-hide">
-              <button
-                type="button"
-                onClick={() => setSelectedGroup("ALL")}
-                className={`
-                  shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all
-                  ${selectedGroup === "ALL"
-                    ? "bg-white/10 text-text-primary border border-white/20"
-                    : "bg-white/[0.02] border border-white/5 text-text-muted hover:bg-white/[0.06] hover:text-text-secondary"
-                  }
-                `}
-              >
-                Tous
-              </button>
               {fakeGroupLetters.map((letter) => (
                 <button
                   key={letter}
@@ -271,7 +257,7 @@ export function MatchsView({
 
         <div ref={contentRef}>
           {mainTab === "POULES" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 max-w-[1400px] mx-auto">
               {displayedMatches.length === 0 ? (
                 <div className="col-span-full rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-12 text-center text-text-muted">
                   Aucun match disponible pour ce groupe

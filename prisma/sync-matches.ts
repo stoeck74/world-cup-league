@@ -16,6 +16,7 @@ import {
   mapMatchStatus,
   extractGroupLetter,
 } from "../src/lib/football-data"
+import { translateTeamName } from "../src/lib/team-translations"
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -58,18 +59,21 @@ async function main() {
   let teamsUpdated = 0
 
   for (const apiTeam of apiTeams) {
+const translatedName = translateTeamName(apiTeam.name)
+    const translatedShortName = translateTeamName(apiTeam.shortName)
+
     const result = await prisma.team.upsert({
       where: { externalId: apiTeam.id },
       create: {
         externalId: apiTeam.id,
-        name: apiTeam.name,
-        shortName: apiTeam.shortName,
+        name: translatedName,
+        shortName: translatedShortName,
         tla: apiTeam.tla,
         crestUrl: apiTeam.crest,
       },
       update: {
-        name: apiTeam.name,
-        shortName: apiTeam.shortName,
+        name: translatedName,
+        shortName: translatedShortName,
         tla: apiTeam.tla,
         crestUrl: apiTeam.crest,
       },

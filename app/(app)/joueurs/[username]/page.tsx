@@ -1,5 +1,6 @@
 import { auth } from "@/../auth"
 import { prisma } from "@/lib/prisma"
+import { getUserPastPredictions, getUserUpcomingPredictions } from "@/lib/dashboard-data"
 import { notFound } from "next/navigation"
 import { Pencil, Trophy, Lightning, Target } from "@phosphor-icons/react/dist/ssr"
 import { EditableField } from "@/components/profile/EditableField"
@@ -37,9 +38,18 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   if (!user) {
     notFound()
   }
+    const isOwnProfile = session.user.username.toLowerCase() === username.toLowerCase()
+  // Pronos passés (visibles par tous)
+  const pastPredictions = await getUserPastPredictions(user.id)
+
+  // Pronos en cours (visibles uniquement sur son propre profil)
+  const upcomingPredictions = isOwnProfile
+    ? await getUserUpcomingPredictions(user.id)
+    : []
   // Récupérer les 18 équipes pour le dropdown (uniquement si c'est ton profil)
 const allTeams = await prisma.team.findMany({
   orderBy: { shortName: "asc" },
+  
   select: {
     id: true,
     name: true,
@@ -50,7 +60,7 @@ const allTeams = await prisma.team.findMany({
 })
 
   // Détecte si c'est ton propre profil
-  const isOwnProfile = session.user.username.toLowerCase() === username.toLowerCase()
+
 
   // Classe CSS pour l'image de fond équipe
   const teamBgClass = user.favoriteTeam?.tla?.toLowerCase().trim() ?? ""
@@ -113,16 +123,6 @@ const allTeams = await prisma.team.findMany({
               </div>
             </div>
 
-            {/* Bouton Modifier — uniquement sur son propre profil */}
-            {isOwnProfile && (
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.03] border border-white/10 text-text-secondary text-xs uppercase tracking-widest hover:bg-white/[0.06] hover:text-text-primary transition-all"
-              >
-                <Pencil size={14} weight="bold" />
-                Modifier mon profil
-              </button>
-            )}
           </header>
 
           {/* ============================================
@@ -194,6 +194,178 @@ const allTeams = await prisma.team.findMany({
               </p>
             </div>
 
+</section>
+
+          {/* ============================================
+              PRONOS PASSÉS
+              ============================================ */}
+{/* ============================================
+              PRONOS EN COURS — Visible uniquement sur son propre profil
+              ============================================ */}
+          {isOwnProfile && (
+            <section className="mt-8 md:mt-10">
+              <div className="mb-4">
+                <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
+                  À venir
+                </p>
+                <h2 className="text-xl font-bold text-text-primary">
+                  Mes pronos en cours
+                </h2>
+                <p className="text-xs text-text-muted mt-1">
+                  Visibles uniquement par toi tant que le match n&apos;est pas joué
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/10 overflow-hidden">
+                {upcomingPredictions.length === 0 ? (
+                  <p className="px-4 py-6 text-sm text-text-muted text-center">
+                    Aucun prono enregistré pour les matchs à venir
+                  </p>
+                ) : (
+                  upcomingPredictions.map((p, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-4 px-4 py-3 border-b border-white/5 last:border-b-0"
+                    >
+                                            {/* Date */}
+                      <div className="text-xs text-text-muted text-right shrink-0 hidden sm:block">
+                        <p>{p.kickoffDate}</p>
+                        <p className="text-text-secondary font-medium">{p.kickoffTime}</p>
+                      </div>
+{/* Équipes avec crests */}
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        {p.homeTeamCrest && (
+                          <img
+                            src={p.homeTeamCrest}
+                            alt={p.homeTeamTla}
+                            className="w-6 h-6 shrink-0 object-contain"
+                          />
+                        )}
+                        <span className="text-sm font-medium text-text-secondary truncate">
+                          {p.homeTeamName}
+                        </span>
+                        <span className="text-text-muted text-xs">vs</span>
+                        <span className="text-sm font-medium text-text-secondary truncate">
+                          {p.awayTeamName}
+                        </span>
+                        {p.awayTeamCrest && (
+                          <img
+                            src={p.awayTeamCrest}
+                            alt={p.awayTeamTla}
+                            className="w-6 h-6 shrink-0 object-contain"
+                          />
+                        )}
+                      </div>
+
+                      {/* Mon prono */}
+                      <div className="text-sm font-bold text-accent shrink-0">
+                        {p.myHomePrediction}-{p.myAwayPrediction}
+                        {p.myQualifierTla && (
+                          <span className="text-text-muted text-xs ml-1">
+                            ★ {p.myQualifierTla}
+                          </span>
+                        )}
+                      </div>
+
+
+                    </div>
+                  ))
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* ============================================
+              PRONOS PASSÉS — Visibles par tous
+              ============================================ */}
+          <section className="mt-8 md:mt-10">
+            <div className="mb-4">
+              <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
+                Historique
+              </p>
+              <h2 className="text-xl font-bold text-text-primary">
+                {isOwnProfile ? "Mes pronos passés" : `Pronos passés de ${user.username}`}
+              </h2>
+            </div>
+
+            <div className="rounded-2xl bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/10 overflow-hidden">
+              {pastPredictions.length === 0 ? (
+                <p className="px-4 py-6 text-sm text-text-muted text-center">
+                  {isOwnProfile
+                    ? "Tu n'as pas encore de pronos sur des matchs joués"
+                    : "Aucun prono passé pour l'instant"}
+                </p>
+              ) : (
+                pastPredictions.map((p, idx) => (
+                  <div
+                    key={idx}
+                    className={`
+                      flex items-center gap-3 px-4 py-3 border-b border-white/5 last:border-b-0
+                      ${p.result === "exact"
+                        ? "bg-green-500/10"
+                        : p.result === "good"
+                        ? "bg-accent/10"
+                        : ""
+                      }
+                    `}
+                  >
+                    {/* Score réel avec crests */}
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      {p.homeTeamCrest ? (
+                        <img
+                          src={p.homeTeamCrest}
+                          alt={p.homeTeamTla}
+                          className="w-6 h-6 shrink-0 object-contain"
+                        />
+                      ) : (
+                        <span className="text-xs font-bold uppercase text-text-muted shrink-0 w-6">
+                          {p.homeTeamTla}
+                        </span>
+                      )}
+                      <span className="text-sm font-bold text-text-primary tabular-nums">
+                        {p.homeScore}
+                      </span>
+                      <span className="text-text-muted">-</span>
+                      <span className="text-sm font-bold text-text-primary tabular-nums">
+                        {p.awayScore}
+                      </span>
+                      {p.awayTeamCrest ? (
+                        <img
+                          src={p.awayTeamCrest}
+                          alt={p.awayTeamTla}
+                          className="w-6 h-6 shrink-0 object-contain"
+                        />
+                      ) : (
+                        <span className="text-xs font-bold uppercase text-text-muted shrink-0 w-6">
+                          {p.awayTeamTla}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Mon prono */}
+                    <div className="text-xs text-text-muted shrink-0">
+                      prono{" "}
+                      <span className="text-text-secondary font-medium">
+                        {p.myHomePrediction}-{p.myAwayPrediction}
+                      </span>
+                    </div>
+
+                    {/* Points obtenus */}
+                    <div className={`
+                      text-sm font-bold w-12 text-right shrink-0
+                      ${p.result === "exact"
+                        ? "text-green-400"
+                        : p.result === "good"
+                        ? "text-accent"
+                        : "text-text-muted"
+                      }
+                    `}>
+                      {p.points > 0 ? `+${p.points}` : "0"}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </section>
 
         </div>

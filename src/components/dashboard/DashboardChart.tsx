@@ -16,48 +16,22 @@ import {
 } from "recharts"
 
 // ============================================
-// TYPES & FAKE DATA
+// TYPES
 // ============================================
 
-type DataPoint = {
-  matchday: number
+export type ChartDataPoint = {
+  index: number
+  label: string
   points: number
-  position: number
   cumulative: number
+  position: number
 }
 
-// 38 journées (placeholder hérité de Panenka League / Ligue 1)
-// TODO V2 : adapter pour la phase de poules CDM (3 matchs par équipe + KO)
-// Les 22 premières ont des données, les suivantes sont à null (futur)
-const fakeChartData: DataPoint[] = [
-  { matchday: 1, points: 4, position: 5, cumulative: 4 },
-  { matchday: 2, points: 1, position: 6, cumulative: 5 },
-  { matchday: 3, points: 6, position: 4, cumulative: 11 },
-  { matchday: 4, points: 3, position: 4, cumulative: 14 },
-  { matchday: 5, points: 0, position: 5, cumulative: 14 },
-  { matchday: 6, points: 8, position: 3, cumulative: 22 },
-  { matchday: 7, points: 2, position: 4, cumulative: 24 },
-  { matchday: 8, points: 5, position: 3, cumulative: 29 },
-  { matchday: 9, points: 1, position: 4, cumulative: 30 },
-  { matchday: 10, points: 4, position: 3, cumulative: 34 },
-  { matchday: 11, points: 0, position: 5, cumulative: 34 },
-  { matchday: 12, points: 7, position: 3, cumulative: 41 },
-  { matchday: 13, points: 1, position: 4, cumulative: 42 },
-  { matchday: 14, points: 0, position: 5, cumulative: 42 },
-  { matchday: 15, points: 6, position: 3, cumulative: 48 },
-  { matchday: 16, points: 3, position: 3, cumulative: 51 },
-  { matchday: 17, points: 0, position: 4, cumulative: 51 },
-  { matchday: 18, points: 4, position: 3, cumulative: 55 },
-  { matchday: 19, points: 2, position: 4, cumulative: 57 },
-  { matchday: 20, points: 1, position: 4, cumulative: 58 },
-  { matchday: 21, points: 5, position: 3, cumulative: 63 },
-]
+type DashboardChartProps = {
+  data: ChartDataPoint[]
+}
 
-// ============================================
-// CONFIG DES TRENDS
-// ============================================
-
-type TrendKey = "points" | "position" | "cumulative"
+type TrendKey = "points" | "cumulative" | "position"
 
 type TrendConfig = {
   key: TrendKey
@@ -72,8 +46,15 @@ const trends: TrendConfig[] = [
   {
     key: "points",
     label: "Points",
-    description: "Points marqués par journée",
+    description: "Points marqués par jour",
     type: "bar",
+    color: "#2196f3",
+  },
+  {
+    key: "cumulative",
+    label: "Cumul",
+    description: "Total points cumulés",
+    type: "area",
     color: "#2196f3",
   },
   {
@@ -84,13 +65,6 @@ const trends: TrendConfig[] = [
     color: "#2196f3",
     yAxisInverted: true,
   },
-  {
-    key: "cumulative",
-    label: "Cumul",
-    description: "Total points cumulés",
-    type: "area",
-    color: "#2196f3",
-  },
 ]
 
 // ============================================
@@ -99,7 +73,7 @@ const trends: TrendConfig[] = [
 
 type TooltipProps = {
   active?: boolean
-  payload?: Array<{ value: number; payload: DataPoint }>
+  payload?: Array<{ value: number; payload: ChartDataPoint }>
   trend: TrendConfig
 }
 
@@ -112,12 +86,13 @@ function CustomTooltip({ active, payload, trend }: TooltipProps) {
   return (
     <div className="bg-bg-elevated border border-white/10 rounded-lg px-4 py-3 shadow-2xl">
       <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
-        Journée {data.matchday}
+        {data.label}
       </p>
       <p className="text-2xl font-bold text-accent">
         {trend.key === "position" ? `${value}e` : value}
-        {trend.key === "points" && <span className="text-base text-primary ml-1">pts</span>}
-        {trend.key === "cumulative" && <span className="text-base text-primary ml-1">pts</span>}
+        {(trend.key === "points" || trend.key === "cumulative") && (
+          <span className="text-base text-primary ml-1">pts</span>
+        )}
       </p>
     </div>
   )
@@ -127,9 +102,34 @@ function CustomTooltip({ active, payload, trend }: TooltipProps) {
 // COMPONENT
 // ============================================
 
-export function DashboardChart() {
-  const [selectedTrend, setSelectedTrend] = useState<TrendKey>("points")
+export function DashboardChart({ data }: DashboardChartProps) {
+  const [selectedTrend, setSelectedTrend] = useState<TrendKey>("cumulative")
   const trend = trends.find((t) => t.key === selectedTrend)!
+
+  // État vide : pas encore de matchs joués
+  if (data.length === 0) {
+    return (
+      <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
+        <div className="mb-6">
+          <p className="text-xs uppercase tracking-widest text-text-primary mb-2">
+            Évolution sur le tournoi
+          </p>
+          <h2 className="text-2xl font-bold text-text-primary">
+            Pas encore de données
+          </h2>
+        </div>
+
+        <div className="h-[300px] w-full flex flex-col items-center justify-center text-center">
+          <p className="text-text-secondary mb-2">
+            Le graphe s&apos;animera dès le premier match joué
+          </p>
+          <p className="text-text-muted text-sm">
+            Coup d&apos;envoi : 11 juin 2026
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
@@ -138,7 +138,7 @@ export function DashboardChart() {
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
         <div>
           <p className="text-xs uppercase tracking-widest text-text-primary mb-2">
-            Évolution sur la saison
+            Évolution sur le tournoi
           </p>
           <h2 className="text-2xl font-bold text-text-primary">
             {trend.description}
@@ -169,10 +169,10 @@ export function DashboardChart() {
       <div className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           {trend.type === "bar" ? (
-            <BarChart data={fakeChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" vertical={false} />
               <XAxis
-                dataKey="matchday"
+                dataKey="label"
                 stroke="#f3f3f3"
                 tick={{ fontSize: 11 }}
                 tickLine={false}
@@ -184,7 +184,7 @@ export function DashboardChart() {
                 tickLine={false}
                 axisLine={false}
               />
-              <Tooltip content={<CustomTooltip trend={trend} />} cursor={{ fill: "rgba(168,255,0,0.05)" }} />
+              <Tooltip content={<CustomTooltip trend={trend} />} cursor={{ fill: "rgba(33,150,243,0.05)" }} />
               <Bar
                 dataKey={trend.key}
                 fill={trend.color}
@@ -192,10 +192,10 @@ export function DashboardChart() {
               />
             </BarChart>
           ) : trend.type === "line" ? (
-            <LineChart data={fakeChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis
-                dataKey="matchday"
+                dataKey="label"
                 stroke="#f3f3f3"
                 tick={{ fontSize: 11 }}
                 tickLine={false}
@@ -208,7 +208,7 @@ export function DashboardChart() {
                 axisLine={false}
                 reversed={trend.yAxisInverted}
               />
-              <Tooltip content={<CustomTooltip trend={trend} />} cursor={{ stroke: "rgba(168,255,0,0.2)" }} />
+              <Tooltip content={<CustomTooltip trend={trend} />} cursor={{ stroke: "rgba(33,150,243,0.2)" }} />
               <Line
                 type="monotone"
                 dataKey={trend.key}
@@ -219,7 +219,7 @@ export function DashboardChart() {
               />
             </LineChart>
           ) : (
-            <AreaChart data={fakeChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={trend.color} stopOpacity={0.3} />
@@ -228,7 +228,7 @@ export function DashboardChart() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis
-                dataKey="matchday"
+                dataKey="label"
                 stroke="#f3f3f3"
                 tick={{ fontSize: 11 }}
                 tickLine={false}
@@ -240,7 +240,7 @@ export function DashboardChart() {
                 tickLine={false}
                 axisLine={false}
               />
-              <Tooltip content={<CustomTooltip trend={trend} />} cursor={{ stroke: "rgba(168,255,0,0.2)" }} />
+              <Tooltip content={<CustomTooltip trend={trend} />} cursor={{ stroke: "rgba(33,150,243,0.2)" }} />
               <Area
                 type="monotone"
                 dataKey={trend.key}

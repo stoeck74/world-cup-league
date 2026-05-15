@@ -34,16 +34,18 @@ const navItems: NavItem[] = [
 ]
 
 const bottomItems: NavItem[] = [
-  { label: "Paramètres", href: "/settings", icon: GearSix },
+
   { label: "Admin", href: "/admin", icon: ShieldCheck, adminOnly: true },
 ]
 
 type SidebarProps = {
   username: string
   role: string
+  avatarStyle: string | null
+  avatarSeed: string | null
 }
 
-export function Sidebar({ username, role }: SidebarProps) {
+export function Sidebar({ username, role, avatarStyle, avatarSeed }: SidebarProps) {
   const pathname = usePathname()
   const [expanded, setExpanded] = useState(false)
 
@@ -60,30 +62,36 @@ export function Sidebar({ username, role }: SidebarProps) {
       onMouseLeave={() => setExpanded(false)}
       className={`
         hidden md:flex flex-col
-        sticky top-0 h-screen shrink-0
+        sticky top-0  shrink-0
         bg-bg-elevated border-r border-border
         transition-all duration-300 ease-in-out
        ${expanded ? "w-[260px]" : "w-20"}
       `}
     >
+
+
+
+<div className="h-screen pt-12">
 {/* Header de la sidebar : logo + wordmark */}
-<div className="flex items-center h-24 border-b border-border overflow-hidden">
-  <Link href="/dashboard" className="flex items-center gap-3 px-3 w-full">
-    <img
-      src="/logo.svg"
-      alt="World Cup League"
-      className="h-14 w-14 object-contain shrink-0"
-    />
-    <div className={`flex flex-col leading-tight whitespace-nowrap transition-opacity duration-200 ${expanded ? "opacity-100" : "opacity-0"}`}>
-      <span className="text-2xl font-black tracking-wide text-text-primary">
-        WORLD CUP
-      </span>
-      <span className="text-lg font-bold text-text-secondary">
-        League
-      </span>
-    </div>
-  </Link>
-</div>
+
+  <div className="flex items-start h-24 border-b border-border overflow-hidden">
+    <Link href="/dashboard" className="flex items-center gap-3 px-3 w-full">
+      <img
+        src="/logo.svg"
+        alt="World Cup League"
+        className="h-14 w-14 object-contain shrink-0"
+      />
+      <div className={`flex flex-col leading-tight whitespace-nowrap transition-opacity duration-200 ${expanded ? "opacity-100" : "opacity-0"}`}>
+        <span className="text-2xl font-black tracking-wide text-text-primary">
+          WORLD CUP
+        </span>
+        <span className="text-lg font-bold text-text-secondary">
+          League
+        </span>
+      </div>
+    </Link>
+
+  </div>
 
       {/* Navigation principale */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-hidden">
@@ -162,10 +170,20 @@ export function Sidebar({ username, role }: SidebarProps) {
           href={`/joueurs/${username}`}
           className="flex items-center gap-3 px-1 py-1 rounded-lg hover:bg-white/5 transition-colors"
         >
-          <div className="w-8 h-8 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center shrink-0">
-            <span className="text-accent text-xs font-bold uppercase">
-              {username[0]}
-            </span>
+          <div className="w-10 h-10 rounded-full bg-accent/20 border border-accent/30 overflow-hidden shrink-0">
+            {avatarStyle && avatarSeed ? (
+              <img
+                src={`https://api.dicebear.com/9.x/${avatarStyle}/svg?seed=${avatarSeed}`}
+                alt={username}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="text-accent text-xs font-bold uppercase">
+                  {username[0]}
+                </span>
+              </div>
+            )}
           </div>
           <div className={`flex-1 min-w-0 transition-opacity duration-200 ${expanded ? "opacity-100" : "opacity-0"}`}>
             <p className="text-sm font-medium text-text-primary truncate">
@@ -175,6 +193,7 @@ export function Sidebar({ username, role }: SidebarProps) {
           </div>
         </Link>
       </div>
+</div>
     </aside>
   )
 }
