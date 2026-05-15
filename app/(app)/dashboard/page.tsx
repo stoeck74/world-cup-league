@@ -2,6 +2,8 @@ import { auth } from "@/../auth"
 import { ArrowRight, TrendUp, Trophy } from "@phosphor-icons/react/dist/ssr"
 import Link from "next/link"
 import { DashboardChart } from "@/components/dashboard/DashboardChart"
+import { PositionPop } from "@/components/dashboard/PositionPop"
+
 import {
   getCurrentStage,
   getUserStats,
@@ -162,12 +164,16 @@ const [
               <p className="text-xs uppercase tracking-widest text-text-accent mb-3">
                 Ma position
               </p>
-              <div className="flex items-baseline">
-                <span className="text-[7vw] font-black text-primary leading-none">
-                  {position.position}
-                </span>
-                <span className="text-6xl text-primary font-bold">e</span>
-              </div>
+<PositionPop
+              position={position.position}
+              totalPlayers={position.totalPlayers}
+              points={position.points}
+              gapToLeader={position.gapToLeader}
+              isLeader={position.isLeader}
+              pointsLastStage={pointsLastStage}
+              predictionsMade={currentStage.predictionsMade}
+              totalMatches={currentStage.matchesCount}
+            />
               <p className="text-sm text-text-secondary mt-2">
                 sur {position.totalPlayers} joueur{position.totalPlayers > 1 ? "s" : ""}
               </p>

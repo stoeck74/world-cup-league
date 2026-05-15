@@ -154,3 +154,24 @@ export async function triggerSync() {
   // TODO: appeler le route handler /api/sync-matches
   return { ok: false, error: "Sync auto pas encore implémentée. Lance npx tsx prisma/sync-matches.ts en local." }
 }
+
+import bcrypt from "bcryptjs"
+
+/**
+ * Reset le mot de passe d'un user à une valeur temporaire.
+ * Retourne le nouveau mot de passe pour que l'admin puisse le transmettre.
+ */
+export async function resetUserPassword(userId: string) {
+  await requireAdmin()
+
+  // Génère un mot de passe temporaire de 10 caractères
+  const tempPassword = Math.random().toString(36).slice(-10)
+  const hashed = await bcrypt.hash(tempPassword, 10)
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { password: hashed },
+  })
+
+  return { ok: true, tempPassword }
+}

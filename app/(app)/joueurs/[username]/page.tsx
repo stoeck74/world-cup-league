@@ -8,6 +8,8 @@ import { updateFavoritePlayer } from "@/lib/actions/profile"
 import { ProfileFavoritePlayer } from "@/components/profile/ProfileFavoritePlayer"
 import { ProfileFavoriteTeam } from "@/components/profile/ProfileFavoriteTeam"
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar"
+import { ProfileSecurityForm } from "@/components/profile/ProfileSecurityForm"
+
 
 // ============================================
 // TYPES
@@ -122,7 +124,7 @@ const allTeams = await prisma.team.findMany({
                 </p>
               </div>
             </div>
-
+            {isOwnProfile && <ProfileSecurityForm />}
           </header>
 
           {/* ============================================

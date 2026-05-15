@@ -1,7 +1,7 @@
 "use client"
 
 import { useTransition } from "react"
-import { setUserRole, deleteUser } from "@/lib/actions/admin"
+import { setUserRole, deleteUser, resetUserPassword } from "@/lib/actions/admin"
 
 type AdminUser = {
   id: string
@@ -61,6 +61,20 @@ function AdminUserRow({ user, isMe }: { user: AdminUser; isMe: boolean }) {
       }
     })
   }
+  const handleResetPassword = () => {
+    if (!confirm(`Reset le mot de passe de ${user.username} ?`)) return
+    startTransition(async () => {
+      const result = await resetUserPassword(user.id)
+      if (result.ok && result.tempPassword) {
+        prompt(
+          `Nouveau mot de passe temporaire pour ${user.username} (à transmettre) :`,
+          result.tempPassword
+        )
+      } else {
+        alert("Erreur lors du reset")
+      }
+    })
+  }
 
   return (
     <div className="rounded-lg bg-black/30 border border-white/5 p-3 flex items-center gap-3 flex-wrap">
@@ -96,9 +110,17 @@ function AdminUserRow({ user, isMe }: { user: AdminUser; isMe: boolean }) {
         <p className="text-sm font-bold text-accent">{user.totalPoints}</p>
       </div>
 
-      <div className="flex gap-1 shrink-0">
+<div className="flex gap-1 shrink-0">
         {!isMe && (
           <>
+            <button
+              onClick={handleResetPassword}
+              disabled={isPending}
+              className="px-2 py-1 rounded bg-white/5 text-text-secondary text-xs hover:bg-white/10 disabled:opacity-50"
+              title="Reset password"
+            >
+              🔑
+            </button>
             <button
               onClick={handleToggleRole}
               disabled={isPending}

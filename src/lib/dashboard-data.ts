@@ -109,10 +109,18 @@ export async function getUserStats(userId: string) {
 export async function getUserPosition(userId: string) {
   const leaderboard = await getLeaderboard()
   const me = leaderboard.find((e) => e.id === userId)
+  const leader = leaderboard[0]
+
+  const myPoints = me?.points ?? 0
+  const leaderPoints = leader?.points ?? 0
+  const gapToLeader = me && leader && me.id !== leader.id ? leaderPoints - myPoints : 0
+
   return {
     position: me?.position ?? leaderboard.length,
     totalPlayers: leaderboard.length,
-    points: me?.points ?? 0,
+    points: myPoints,
+    gapToLeader,
+    isLeader: me?.id === leader?.id,
   }
 }
 
