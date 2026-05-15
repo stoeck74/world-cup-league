@@ -25,8 +25,16 @@ export type FakeMatchDetailed = {
   id: string
   stage: FakeStage
   group?: string
+
+  // Placeholders pour les KO (toujours présents, viennent du calendrier FIFA)
+  // Pour les matchs de poule : null (équipes toujours connues d'office)
+  homePlaceholder?: string  // ex: "1er Groupe A", "V. M89"
+  awayPlaceholder?: string
+
+  // Vraies équipes (null tant que les qualifiés ne sont pas connus pour les KO)
   homeTeam: FakeMatchTeam | null
   awayTeam: FakeMatchTeam | null
+
   kickoffDate: string
   kickoffTime: string
   venue?: string
@@ -557,33 +565,88 @@ export const fakeGroupMatches: FakeMatchDetailed[] = [
 // ROUND OF 32 — 16 matchs (CDM 2026)
 // Équipes à déterminer (Placeholders)
 // ============================================
+// ============================================
+// MATCHS KO — Placeholders en attendant l'API
+// Quand l'API remplira homeTeam/awayTeam, les cartes deviendront pronosticables
+// ============================================
+
+// Helper pour matchs KO sans équipes connues
+const ko = (
+  id: string,
+  stage: FakeStage,
+  homePlaceholder: string,
+  awayPlaceholder: string,
+  kickoffDate: string,
+  kickoffTime: string,
+  venue: string
+): FakeMatchDetailed => ({
+  id,
+  stage,
+  homePlaceholder,
+  awayPlaceholder,
+  homeTeam: null,
+  awayTeam: null,
+  kickoffDate,
+  kickoffTime,
+  venue,
+  status: "scheduled",
+})
+
+// 1/16e de finale — 16 matchs (28 juin → 3 juillet 2026)
 export const fakeRound32Matches: FakeMatchDetailed[] = [
-  {
-    id: "r32-01", stage: "ROUND_32",
-    homeTeam: t("1er Groupe A", "1A"), awayTeam: t("3e Groupe C/D/E", "3CDE"),
-    kickoffDate: "Lundi 29 juin", kickoffTime: "21:00",
-    venue: "SoFi Stadium, Inglewood", status: "scheduled",
-  },
-  {
-    id: "r32-02", stage: "ROUND_32",
-    homeTeam: t("1er Groupe E", "1E"), awayTeam: t("3e Groupe A/B/C", "3ABC"),
-    kickoffDate: "Mardi 30 juin", kickoffTime: "00:00",
-    venue: "MetLife Stadium, East Rutherford", status: "scheduled",
-  },
-  {
-    id: "r32-03", stage: "ROUND_32",
-    homeTeam: t("1er Groupe I", "1I"), awayTeam: t("3e Groupe F/G/H", "3FGH"),
-    kickoffDate: "Mardi 30 juin", kickoffTime: "21:00",
-    venue: "Estadio Azteca, Mexico", status: "scheduled",
-  },
-  {
-    id: "r32-04", stage: "ROUND_32",
-    homeTeam: t("2e Groupe A", "2A"), awayTeam: t("2e Groupe B", "2B"),
-    kickoffDate: "Mercredi 1 juillet", kickoffTime: "00:00",
-    venue: "Levi's Stadium, Santa Clara", status: "scheduled",
-  },
-  // Tu peux ajouter les 12 autres matchs sur ce modèle plus tard
-];
+  ko("r32-73", "ROUND_32", "2e Groupe A", "2e Groupe B", "Dimanche 28 juin", "21:00", "SoFi Stadium, Inglewood"),
+  ko("r32-76", "ROUND_32", "1er Groupe C", "2e Groupe F", "Lundi 29 juin", "19:00", "NRG Stadium, Houston"),
+  ko("r32-74", "ROUND_32", "1er Groupe E", "3e A/B/C/D/F", "Lundi 29 juin", "22:30", "Gillette Stadium, Foxborough"),
+  ko("r32-75", "ROUND_32", "1er Groupe F", "2e Groupe C", "Mardi 30 juin", "03:00", "Estadio BBVA, Monterrey"),
+  ko("r32-78", "ROUND_32", "2e Groupe E", "2e Groupe I", "Mardi 30 juin", "19:00", "AT&T Stadium, Arlington"),
+  ko("r32-77", "ROUND_32", "1er Groupe I", "3e C/D/F/G/H", "Mardi 30 juin", "23:00", "MetLife Stadium, East Rutherford"),
+  ko("r32-79", "ROUND_32", "1er Groupe A", "3e C/E/F/H/I", "Mercredi 1 juillet", "03:00", "Estadio Azteca, Mexico"),
+  ko("r32-80", "ROUND_32", "1er Groupe L", "3e E/H/I/J/K", "Mercredi 1 juillet", "18:00", "Mercedes-Benz Stadium, Atlanta"),
+  ko("r32-82", "ROUND_32", "1er Groupe G", "3e A/E/H/I/J", "Mercredi 1 juillet", "22:00", "Lumen Field, Seattle"),
+  ko("r32-81", "ROUND_32", "1er Groupe D", "3e B/E/F/I/J", "Jeudi 2 juillet", "02:00", "Levi's Stadium, Santa Clara"),
+  ko("r32-84", "ROUND_32", "1er Groupe H", "2e Groupe J", "Jeudi 2 juillet", "21:00", "SoFi Stadium, Inglewood"),
+  ko("r32-83", "ROUND_32", "2e Groupe K", "2e Groupe L", "Vendredi 3 juillet", "01:00", "BMO Field, Toronto"),
+  ko("r32-85", "ROUND_32", "1er Groupe B", "3e E/F/G/I/J", "Vendredi 3 juillet", "05:00", "BC Place, Vancouver"),
+  ko("r32-88", "ROUND_32", "2e Groupe D", "2e Groupe G", "Vendredi 3 juillet", "20:00", "AT&T Stadium, Arlington"),
+  ko("r32-86", "ROUND_32", "1er Groupe J", "2e Groupe H", "Samedi 4 juillet", "00:00", "Hard Rock Stadium, Miami Gardens"),
+  ko("r32-87", "ROUND_32", "1er Groupe K", "3e D/E/I/J/L", "Samedi 4 juillet", "03:30", "Arrowhead Stadium, Kansas City"),
+]
+
+// 1/8e — 8 matchs (4-7 juillet)
+export const fakeRound16Matches: FakeMatchDetailed[] = [
+  ko("r16-90", "ROUND_16", "V. M73", "V. M75", "Samedi 4 juillet", "19:00", "NRG Stadium, Houston"),
+  ko("r16-89", "ROUND_16", "V. M74", "V. M77", "Samedi 4 juillet", "23:00", "Lincoln Financial Field, Philadelphia"),
+  ko("r16-91", "ROUND_16", "V. M76", "V. M78", "Dimanche 5 juillet", "22:00", "MetLife Stadium, East Rutherford"),
+  ko("r16-92", "ROUND_16", "V. M79", "V. M80", "Lundi 6 juillet", "02:00", "Estadio Azteca, Mexico"),
+  ko("r16-93", "ROUND_16", "V. M83", "V. M84", "Lundi 6 juillet", "21:00", "AT&T Stadium, Arlington"),
+  ko("r16-94", "ROUND_16", "V. M81", "V. M82", "Mardi 7 juillet", "02:00", "Lumen Field, Seattle"),
+  ko("r16-95", "ROUND_16", "V. M86", "V. M88", "Mardi 7 juillet", "18:00", "Mercedes-Benz Stadium, Atlanta"),
+  ko("r16-96", "ROUND_16", "V. M85", "V. M87", "Mardi 7 juillet", "22:00", "BC Place, Vancouver"),
+]
+
+// Quarts — 4 matchs (9-11 juillet)
+export const fakeQuarterMatches: FakeMatchDetailed[] = [
+  ko("qf-97", "QUARTER", "V. M89", "V. M90", "Jeudi 9 juillet", "22:00", "Gillette Stadium, Foxborough"),
+  ko("qf-98", "QUARTER", "V. M93", "V. M94", "Vendredi 10 juillet", "21:00", "SoFi Stadium, Inglewood"),
+  ko("qf-99", "QUARTER", "V. M91", "V. M92", "Samedi 11 juillet", "23:00", "Hard Rock Stadium, Miami Gardens"),
+  ko("qf-100", "QUARTER", "V. M95", "V. M96", "Dimanche 12 juillet", "03:00", "Arrowhead Stadium, Kansas City"),
+]
+
+// Demis — 2 matchs (14-15 juillet)
+export const fakeSemiMatches: FakeMatchDetailed[] = [
+  ko("sf-101", "SEMI", "V. M97", "V. M98", "Mardi 14 juillet", "21:00", "AT&T Stadium, Arlington"),
+  ko("sf-102", "SEMI", "V. M99", "V. M100", "Mercredi 15 juillet", "21:00", "Mercedes-Benz Stadium, Atlanta"),
+]
+
+// Petite finale — 1 match (18 juillet)
+export const fakeThirdPlaceMatches: FakeMatchDetailed[] = [
+  ko("3p-103", "THIRD_PLACE", "P. M101", "P. M102", "Samedi 18 juillet", "23:00", "Hard Rock Stadium, Miami Gardens"),
+]
+
+// Finale — 1 match (19 juillet)
+export const fakeFinalMatches: FakeMatchDetailed[] = [
+  ko("f-104", "FINAL", "V. M101", "V. M102", "Dimanche 19 juillet", "21:00", "MetLife Stadium, East Rutherford"),
+]
 
 // ============================================
 // FIN DU FICHIER : HELPERS & CONSTANTES
@@ -611,10 +674,21 @@ export const fakeStages: FakeStageInfo[] = [
 export function getMatchesByStage(stage: FakeStage): FakeMatchDetailed[] {
   switch (stage) {
     case "GROUP":
-      return fakeGroupMatches;
+      return fakeGroupMatches
     case "ROUND_32":
-      return fakeRound32Matches; // Assure-toi que ce tableau existe ou est déclaré []
+      return fakeRound32Matches
+    case "ROUND_16":
+      return fakeRound16Matches
+    case "QUARTER":
+      return fakeQuarterMatches
+    case "SEMI":
+      return fakeSemiMatches
+    case "THIRD_PLACE":
+      return fakeThirdPlaceMatches
+    case "FINAL":
+      return fakeFinalMatches
     default:
-      return [];
+      return []
   }
 }
+

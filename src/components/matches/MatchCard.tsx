@@ -1,6 +1,6 @@
 "use client"
 
-import { Lock } from "@phosphor-icons/react"
+import { Lock, Star } from "@phosphor-icons/react"
 import { ScoreInput } from "./ScoreInput"
 import type { FakeMatchDetailed } from "@/lib/fake-data/matches"
 
@@ -10,48 +10,98 @@ type MatchCardProps = {
   match: FakeMatchDetailed
   homePrediction: number | null
   awayPrediction: number | null
+  qualifierPrediction: string | null
   stageStatus: StageStatus
-  onPredictionChange: (matchId: string, home: number | null, away: number | null) => void
+  onPredictionChange: (
+    matchId: string,
+    home: number | null,
+    away: number | null,
+    qualifier: string | null
+  ) => void
+  onLeaveCard?: (matchId: string) => void
+  justSaved?: boolean
+    isSaved?: boolean
 }
-
-// ============================================
-// MATCH CARD — Coupe du Monde 2026
-//
-// Différences vs Panenka League / Ligue 1 :
-//  - Pas de banco
-//  - Les équipes peuvent être null (KO sans qualifiés connus)
-//  - Affichage du groupe (A → L) si phase de poules
-//  - À VENIR : champ "qui passe ?" pour les KO (à coder en V2 avec qualifierPrediction)
-// ============================================
 
 export function MatchCard({
   match,
   homePrediction,
   awayPrediction,
+  qualifierPrediction,
   stageStatus,
   onPredictionChange,
+  onLeaveCard,
+  justSaved = false,
+  isSaved = false,
 }: MatchCardProps) {
-  const handleHomeChange = (value: number) => {
-    onPredictionChange(match.id, value, awayPrediction)
+  const handleHomeChange = (value: number | null) => {
+    onPredictionChange(match.id, value, awayPrediction, qualifierPrediction)
   }
 
-  const handleAwayChange = (value: number) => {
-    onPredictionChange(match.id, homePrediction, value)
+  const handleAwayChange = (value: number | null) => {
+    onPredictionChange(match.id, homePrediction, value, qualifierPrediction)
   }
 
-  // Lecture seule si phase passée/future, ou si match commencé
+  const handleQualifierClick = (tla: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    // Toggle : si on reclique sur la même équipe, on désélectionne
+    const newQualifier = qualifierPrediction === tla ? null : tla
+    onPredictionChange(match.id, homePrediction, awayPrediction, newQualifier)
+  }
+
   const isReadOnly = stageStatus !== "current" || match.status !== "scheduled"
   const isFinished = match.status === "finished"
-
-  // Si les équipes ne sont pas connues (KO en attente de qualif), on affiche un placeholder
   const teamsKnown = match.homeTeam !== null && match.awayTeam !== null
 
+  // État pristine : aucun prono engagé
+  const isPristine = homePrediction === null && awayPrediction === null
+
+  // Match KO avec score nul engagé → nécessite une étoile
+  const isKnockout = match.stage !== "GROUP"
+  const isDrawPrediction =
+    homePrediction !== null &&
+    awayPrediction !== null &&
+    homePrediction === awayPrediction
+  const showStars = isKnockout && isDrawPrediction && teamsKnown
+  const isMissingQualifier = showStars && qualifierPrediction === null
+
+  const handleCardClick = () => {
+    if (isReadOnly || !teamsKnown || !isPristine) return
+    onPredictionChange(match.id, 0, 0, null)
+  }
+
   return (
-    <div className="relative rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl overflow-hidden">
+    <div
+      onClick={handleCardClick}
+      onMouseLeave={() => onLeaveCard?.(match.id)}
+      className={`
+        relative rounded-2xl border backdrop-blur-xl overflow-hidden transition-all
+        ${isMissingQualifier
+          ? "bg-orange-500/[0.06] border-orange-500/40"
+          : "bg-white/[0.03] border-white/10"
+        }
+        ${isPristine && !isReadOnly && teamsKnown
+          ? "cursor-pointer hover:bg-white/[0.05] hover:border-white/20"
+          : ""
+        }
+      `}
+    >
+       {/* Gradient vert en bas — permanent si sauvé, flash au moment du save */}
+      {(isSaved || justSaved) && (
+        <div
+          className={`
+            pointer-events-none absolute bottom-0 left-0 right-0 h-24
+            bg-gradient-to-t from-sky-900/50 via-sky-500/30 to-transparent
+            border-b border-sky-900
+            transition-opacity duration-500
+            ${justSaved ? "opacity-100" : "opacity-70"}
+          `}
+        />
+      )}
 
       <div className="relative p-5 md:p-6">
 
-        {/* Header : date + groupe (si poules) + lock (si future) */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-5 h-8">
           <div className="flex items-center gap-3">
             <p className="text-xs uppercase tracking-widest text-text-muted">
@@ -64,7 +114,6 @@ export function MatchCard({
             )}
           </div>
 
-          {/* Indicateur lecture seule pour phases futures */}
           {stageStatus === "future" && (
             <div className="w-8 h-8 rounded-full bg-white/[0.03] flex items-center justify-center">
               <Lock size={14} weight="regular" className="text-text-muted" />
@@ -72,16 +121,25 @@ export function MatchCard({
           )}
         </div>
 
-        {/* Si équipes pas encore connues (KO en attente) */}
+        {/* Équipes pas encore connues */}
         {!teamsKnown ? (
-          <div className="py-8 text-center">
-            <p className="text-sm text-text-muted italic">
-              Équipes à déterminer
-            </p>
-            <p className="text-xs text-text-muted/60 mt-1">
-              Disponible une fois les qualifiés connus
-            </p>
-          </div>
+          <>
+            <div className="flex items-center justify-between py-3 border-b border-white/5">
+              <p className="text-sm font-medium text-text-secondary italic">
+                {match.homePlaceholder ?? "Équipe à déterminer"}
+              </p>
+            </div>
+            <div className="flex items-center justify-between py-3">
+              <p className="text-sm font-medium text-text-secondary italic">
+                {match.awayPlaceholder ?? "Équipe à déterminer"}
+              </p>
+            </div>
+            <div className="mt-4 pt-4 border-t border-white/5 text-center">
+              <p className="text-xs text-text-muted/60">
+                Pronostic disponible une fois les qualifiés connus
+              </p>
+            </div>
+          </>
         ) : (
           <>
             {/* Équipe domicile */}
@@ -100,6 +158,27 @@ export function MatchCard({
                 </span>
               </div>
               <div className="shrink-0 flex items-center gap-3">
+                {/* Étoile domicile */}
+                {showStars && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleQualifierClick(match.homeTeam!.tla, e)}
+                    disabled={isReadOnly}
+                    className="flex items-center justify-center transition-all hover:scale-110"
+                    aria-label={`${match.homeTeam!.shortName} se qualifie`}
+                  >
+                    <Star
+                      size={20}
+                      weight={qualifierPrediction === match.homeTeam!.tla ? "fill" : "regular"}
+                      className={
+                        qualifierPrediction === match.homeTeam!.tla
+                          ? "text-accent"
+                          : "text-text-muted hover:text-text-secondary"
+                      }
+                    />
+                  </button>
+                )}
+
                 {isFinished && match.homeScore !== undefined && (
                   <span className="text-3xl md:text-4xl font-black leading-none tabular-nums text-text-primary">
                     {match.homeScore}
@@ -129,6 +208,27 @@ export function MatchCard({
                 </span>
               </div>
               <div className="shrink-0 flex items-center gap-3">
+                {/* Étoile extérieur */}
+                {showStars && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleQualifierClick(match.awayTeam!.tla, e)}
+                    disabled={isReadOnly}
+                    className="flex items-center justify-center transition-all hover:scale-110"
+                    aria-label={`${match.awayTeam!.shortName} se qualifie`}
+                  >
+                    <Star
+                      size={20}
+                      weight={qualifierPrediction === match.awayTeam!.tla ? "fill" : "regular"}
+                      className={
+                        qualifierPrediction === match.awayTeam!.tla
+                          ? "text-accent"
+                          : "text-text-muted hover:text-text-secondary"
+                      }
+                    />
+                  </button>
+                )}
+
                 {isFinished && match.awayScore !== undefined && (
                   <span className="text-3xl md:text-4xl font-black leading-none tabular-nums text-text-primary">
                     {match.awayScore}
@@ -141,10 +241,19 @@ export function MatchCard({
                 />
               </div>
             </div>
+
+            {/* Indicateur pristine */}
+            {isPristine && !isReadOnly && (
+              <div className="mt-4 pt-4 border-t border-white/5 text-center">
+                <p className="text-xs text-text-muted/80">
+                  Clique sur la carte pour pronostiquer
+                </p>
+              </div>
+            )}
           </>
         )}
 
-        {/* Footer points gagnés (matchs terminés) */}
+        {/* Footer points */}
         {isFinished && match.myPoints !== undefined && (
           <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
             <p className="text-xs uppercase tracking-widest text-text-muted">

@@ -1,19 +1,81 @@
+'use client';
+
 import Link from "next/link"
+import { useState, useEffect, useRef  } from "react";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr"
 import { SlotMachine } from "@/components/landing/SlotMachine"
 import { HomeAnimations } from "@/components/landing/HomeAnimations"
+import { HomePreloader } from "@/components/landing/HomePreloader"
+
 
 
 export default function Home() {
+  const [videoFinished, setVideoFinished] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+const videoRef = useRef<HTMLVideoElement>(null);
+
+useEffect(() => {
+  const video = videoRef.current;
+  if (!video) return;
+
+  // Si la vidéo est déjà dans le cache Firefox/Chrome, readyState >= 2
+  if (video.readyState >= 2) {
+    setVideoReady(true);
+    return;
+  }
+
+  // Sinon on attend les events de chargement
+  const handleReady = () => setVideoReady(true);
+
+  video.addEventListener("canplay", handleReady);
+  video.addEventListener("loadeddata", handleReady);
+  video.addEventListener("playing", handleReady);
+
+  video.load();
+  video.play().catch(() => {
+    // autoplay bloqué, on attend les events
+  });
+
+  return () => {
+    video.removeEventListener("canplay", handleReady);
+    video.removeEventListener("loadeddata", handleReady);
+    video.removeEventListener("playing", handleReady);
+  };
+}, []);
+
+
+
   return (
     <main className="relative min-h-screen bg-home overflow-hidden">
-
-      {/* ============================================
-          HALOS DÉCORATIFS — Ambiance chartreuse
+    <HomePreloader isVideoReady={videoReady} />
+      {/* 1. L'IMAGE DE FOND (Toujours là, cachée derrière) */}
+  <img 
+    src="/intro.jpg" 
+    alt="Background" 
+    className="absolute inset-0 w-full h-full object-cover"
+  />
+{/* ============================================
+          VIDEO BACKGROUND
           ============================================ */}
-      <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[140px] pointer-events-none -translate-x-1/3 -translate-y-1/3" />
-      <div className="absolute bottom-0 right-0 w-[700px] h-[700px] bg-accent/8 rounded-full blur-[160px] pointer-events-none translate-x-1/3 translate-y-1/3" />
+      <div className="absolute inset-0 z-0">
+<video
+    ref={videoRef}
+    autoPlay
+    muted
+    playsInline
+    preload="auto"
+    onEnded={() => setVideoFinished(true)}
+    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+      videoFinished ? 'opacity-0' : 'opacity-100'
+    }`}
+  >
+    <source src="/intro.mp4" type="video/mp4" />
+  </video>
+        {/* Overlay pour assombrir ou teinter la vidéo si besoin (optionnel) */}
+        <div className="absolute bg-black/50 inset-0 ntsc-effect" /> 
+      </div>
 
+    
       {/* ============================================
           NAV TOP
           ============================================ */}
@@ -21,10 +83,10 @@ export default function Home() {
         <div className="flex items-center gap-3">
           <img src="/logo.svg" alt="" className="h-16 w-16 md:h-24 md:w-24" />
           <div className="flex flex-col leading-tight">
-            <span className="text-xl md:text-3xl font-extrabold tracking-wider text-text-primary">
+            <span className="text-xl md:text-5xl font-extrabold tracking-wider text-text-primary">
               WORLD CUP
             </span>
-            <span className="text-base md:text-xl font-medium text-text-secondary -mt-0.5">
+            <span className="text-base md:text-2xl font-medium text-text-secondary -mt-0.5">
               League
             </span>
           </div>
@@ -33,13 +95,13 @@ export default function Home() {
         <div className="hidden md:flex items-center gap-6 text-xs uppercase tracking-widest">
           <Link
             href="/login"
-            className="text-text-secondary hover:text-text-primary transition-colors"
+            className="text-text-secondary hover:text-accent transition-colors font-bold"
           >
             Connexion
           </Link>
           <Link
             href="/register"
-            className="bg-accent text-bg px-4 py-2 rounded-md font-semibold hover:bg-accent-hover transition-colors"
+            className="bg-accent text-bg px-4 py-4 rounded-md font-semibold hover:bg-accent-hover transition-colors"
           >
             S&apos;inscrire
           </Link>

@@ -134,22 +134,6 @@ body {
   filter:brightness(0.8) contrast(1.1); 
 }
 
-.bg-home {
-  position: relative;
-  isolation: isolate;
-}
-
-.bg-home::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: url('/home.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: brightness(0.) contrast(1); 
-}
 
 /* ============================================
    SCROLLBAR HIDE
@@ -183,7 +167,22 @@ body {
   height:100vh;
   filter: brightness(0.4) contrast(1);  
 }
-
+.bg-matches::after {
+  content: "";
+  position: absolute;
+  top: calc(100vh - 200px); /* commence 200px avant la fin de l'image */
+  left: 0;
+  right: 0;
+  height: 200px;
+  z-index: -1;
+background: linear-gradient(
+  to bottom,
+  transparent 0%,
+  rgba(10, 10, 10, 0.5) 50%,
+  #0a0a0a 100%
+);
+  pointer-events: none;
+}
 
 
 
@@ -224,4 +223,161 @@ body {
   }
 } 
 
+.bg-ranking {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background: #0a0a0a;
+}
+
+.bg-ranking::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/ranking.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height:100vh; 
+  filter: brightness(0.4) contrast(1);  
+}
+.bg-ranking::after {
+  content: "";
+  position: absolute;
+  top: calc(100vh - 200px); /* commence 200px avant la fin de l'image */
+  left: 0;
+  right: 0;
+  height: 200px;
+  z-index: -1;
+background: linear-gradient(
+  to bottom,
+  transparent 0%,
+  rgba(10, 10, 10, 0.5) 50%,
+  #0a0a0a 100%
+);
+  pointer-events: none;
+}
+
+.bg-players {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background: #0a0a0a;
+}
+
+.bg-players::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/players.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height:100vh;
+  filter: brightness(0.5) contrast(1);  
+}
+
+.bg-aide {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background: #0a0a0a;
+}
+
+.bg-aide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/aide.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height:100vh;
+  filter: brightness(0.3) contrast(1);
+} 
+.bg-aide::after {
+  content: "";
+  position: absolute;
+  top: calc(100vh - 200px); /* commence 200px avant la fin de l'image */
+  left: 0;
+  right: 0;
+  height: 200px;
+  z-index: -1;
+background: linear-gradient(
+  to bottom,
+  transparent 0%,
+  rgba(10, 10, 10, 0.5) 50%,
+  #0a0a0a 100%
+);
+  pointer-events: none;
+}
+
+.ntsc-effect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+
+  /* 1. Les Scanlines (Lignes de balayage) */
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 4px;  
+  
+  /* 2. Le Grain NTSC (Généré en SVG pour éviter le lien mort) */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.05; /* Ajuste l'intensité du grain ici */
+    /* Ce SVG crée un bruit aléatoire parfait */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    animation: noise-anim 0.2s steps(1) infinite;
+  } 
+
+  /* 3. Vignettage (Bords sombres) */
+  box-shadow: inset 0 0 120px rgba(0,0,0,0.75);
+}
+
+/* Animation pour faire vibrer le grain */
+@keyframes noise-anim {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(-1%, -1%); }
+  50% { transform: translate(1%, 1%); }
+  75% { transform: translate(-1%, 1%); }
+  100% { transform: translate(1%, -1%);
+  }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  50% { opacity: 1; }
+  100% { opacity: 0.98; }
+}
+
+.bg-home {
+  position: relative; /* Indispensable pour que le gradient se place par rapport à lui */
+  overflow: hidden;
+}
+
+.bg-home::after {
+  content: "";
+  position: absolute;
+  bottom: 0; /* On le colle en bas */
+  left: 0;
+  right: 0;
+  height: 400px; /* Ta hauteur souhaitée */
+  z-index: 10; /* Doit être au-dessus de l'image (z-0) */
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(10, 10, 10, 0.5) 40%, 
+    #0a0a0a 100%
+  );
+  pointer-events: none;
+}
 

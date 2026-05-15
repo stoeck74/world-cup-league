@@ -11,6 +11,8 @@ import {
   GearSix,
   ShieldCheck,
   SignOut,
+  Ranking,
+  Question,
 } from "@phosphor-icons/react"
 import { logoutAction } from "@/lib/actions/auth"
 
@@ -24,8 +26,11 @@ type NavItem = {
 const navItems: NavItem[] = [
   { label: "Accueil", href: "/dashboard", icon: House },
   { label: "Matchs", href: "/matchs", icon: SoccerBall },
-  { label: "Classement", href: "/classement", icon: Trophy },
+{ label: "Classement", href: "/classement", icon: Trophy },
+{ label: "Résultats", href: "/resultats", icon: Ranking },
   { label: "Joueurs", href: "/joueurs", icon: UsersThree },
+  { label: "Comment ça marche", href: "/aide", icon: Question },
+
 ]
 
 const bottomItems: NavItem[] = [

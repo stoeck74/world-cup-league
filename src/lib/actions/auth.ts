@@ -51,21 +51,10 @@ export async function registerAction(formData: FormData) {
     redirect("/register?error=username_short")
   }
 
-  // Vérifier que le code d'invitation est valide
-  const invitation = await prisma.invitationCode.findUnique({
-    where: { code: invitationCode },
-  })
-
-  if (!invitation) {
+  // Vérifier que le code d'invitation correspond au code de la League
+  const validCode = process.env.INVITATION_CODE
+  if (!validCode || invitationCode !== validCode) {
     redirect("/register?error=invalid_code")
-  }
-
-  if (invitation.usedById) {
-    redirect("/register?error=used_code")
-  }
-
-  if (invitation.expiresAt && invitation.expiresAt < new Date()) {
-    redirect("/register?error=expired_code")
   }
 
   // Vérifier l'unicité de l'email et du username
@@ -86,23 +75,13 @@ export async function registerAction(formData: FormData) {
   // Hash du password
   const hashedPassword = await bcrypt.hash(password, 10)
 
-  // Création du user et marquage du code comme utilisé (transaction atomique)
-  await prisma.$transaction(async (tx) => {
-    const user = await tx.user.create({
-      data: {
-        email,
-        username,
-        password: hashedPassword,
-      },
-    })
-
-    await tx.invitationCode.update({
-      where: { code: invitationCode },
-      data: {
-        usedById: user.id,
-        usedAt: new Date(),
-      },
-    })
+  // Création du user
+  await prisma.user.create({
+    data: {
+      email,
+      username,
+      password: hashedPassword,
+    },
   })
 
   // Login automatique après création
@@ -110,7 +89,7 @@ export async function registerAction(formData: FormData) {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: "/dashboard",
+      redirectTo: "/aide",
     })
   } catch (error) {
     if (error instanceof AuthError) {
