@@ -20,6 +20,7 @@ type MatchPredictionModalProps = {
   ) => void
   onLeaveCard: (matchId: string) => void
   onClose: () => void
+  onReset?: (matchId: string) => void
 }
 
 export function MatchPredictionModal({

@@ -22,6 +22,7 @@ type KnockoutBracketProps = {
     qualifier: string | null
   ) => void
   onLeaveCard: (matchId: string) => void
+  onReset: (matchId: string) => void
   justSavedIds: Set<string>
   savedIds: Set<string>
 }
@@ -33,6 +34,7 @@ export function KnockoutBracket({
   predictions,
   onPredictionChange,
   onLeaveCard,
+  onReset,
   justSavedIds,
   savedIds,
 }: KnockoutBracketProps) {
@@ -299,7 +301,7 @@ export function KnockoutBracket({
       </div>
 
       {/* MODAL */}
-      {selectedMatch && (
+           {selectedMatch && (
         <MatchPredictionModal
           match={selectedMatch}
           homePrediction={predictions.get(selectedMatch.id)?.home ?? null}
@@ -309,6 +311,7 @@ export function KnockoutBracket({
           isSaved={savedIds.has(selectedMatch.id)}
           onPredictionChange={onPredictionChange}
           onLeaveCard={onLeaveCard}
+          onReset={onReset}
           onClose={() => setSelectedMatchId(null)}
         />
       )}

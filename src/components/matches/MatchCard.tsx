@@ -1,6 +1,7 @@
 "use client"
 
-import { Lock, Star } from "@phosphor-icons/react"
+import { Lock, Star, X } from "@phosphor-icons/react"
+
 import { ScoreInput } from "./ScoreInput"
 import type { FakeMatchDetailed } from "@/lib/fake-data/matches"
 
@@ -19,8 +20,9 @@ type MatchCardProps = {
     qualifier: string | null
   ) => void
   onLeaveCard?: (matchId: string) => void
+  onReset?: (matchId: string) => void
   justSaved?: boolean
-    isSaved?: boolean
+  isSaved?: boolean
 }
 
 export function MatchCard({
@@ -31,6 +33,7 @@ export function MatchCard({
   stageStatus,
   onPredictionChange,
   onLeaveCard,
+  onReset,
   justSaved = false,
   isSaved = false,
 }: MatchCardProps) {
@@ -97,6 +100,21 @@ export function MatchCard({
             ${justSaved ? "opacity-100" : "opacity-70"}
           `}
         />
+      )}
+       {/* Bouton reset — visible si engagé (au moins 1 score non null) */}
+      {!isPristine && !isReadOnly && onReset && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onReset(match.id)
+          }}
+          className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-text-muted hover:text-text-primary transition-colors"
+          title="Annuler ce prono"
+          aria-label="Annuler ce prono"
+        >
+          <X size={12} weight="bold" />
+        </button>
       )}
 
       <div className="relative p-5 md:p-6">

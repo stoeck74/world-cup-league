@@ -115,6 +115,38 @@ export function MatchsView({
 
     debounceTimers.current.set(matchId, timer)
   }
+const handleResetPrediction = (matchId: string) => {
+    // Retire immédiatement le marqueur "saved" (cache le gradient)
+    setSavedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(matchId)
+      return next
+    })
+    setJustSavedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(matchId)
+      return next
+    })
+
+    // Reset les prédictions
+    setPredictions((prev) => {
+      const next = new Map(prev)
+      next.set(matchId, { home: null, away: null, qualifier: null })
+      return next
+    })
+
+    // Cancel debounce existant et déclenche la suppression DB
+    const existing = debounceTimers.current.get(matchId)
+    if (existing) clearTimeout(existing)
+    debounceTimers.current.delete(matchId)
+    dirtyMatchIds.current.delete(matchId)
+
+    // Suppression directe en DB (sans passer par performSave qui regarderait
+    // un state pas encore mis à jour)
+    savePrediction(matchId, null, null, null).catch((err) => {
+      console.error("Reset failed:", err)
+    })
+  }
 
   const handleLeaveCard = (matchId: string) => {
     if (!dirtyMatchIds.current.has(matchId)) return
@@ -279,6 +311,7 @@ export function MatchsView({
                       stageStatus="current"
                       onPredictionChange={handlePredictionChange}
                       onLeaveCard={handleLeaveCard}
+                      onReset={handleResetPrediction}
                       justSaved={justSavedIds.has(match.id)}
                       isSaved={isSaved}
                     />
@@ -302,12 +335,13 @@ export function MatchsView({
                 })
               )}
             </div>
-          ) : (
+                    ) : (
             <KnockoutBracket
               matches={matches}
               predictions={predictions}
               onPredictionChange={handlePredictionChange}
               onLeaveCard={handleLeaveCard}
+              onReset={handleResetPrediction}
               justSavedIds={justSavedIds}
               savedIds={savedIds}
             />
