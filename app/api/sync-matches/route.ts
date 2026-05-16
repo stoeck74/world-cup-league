@@ -10,6 +10,7 @@ import {
   extractGroupLetter,
 } from "@/lib/football-data"
 import { calculateAllPointsInternal } from "@/lib/actions/points"
+import { translateTeamName } from "@/lib/team-translations"
 
 
 // ============================================
@@ -69,19 +70,22 @@ export async function GET(request: NextRequest) {
     // ============================================
     const apiTeams = await fetchTeams()
     let teamsUpserted = 0
-    for (const apiTeam of apiTeams) {
+for (const apiTeam of apiTeams) {
+      const translatedName = translateTeamName(apiTeam.name)
+      const translatedShortName = translateTeamName(apiTeam.shortName)
+
       await prisma.team.upsert({
         where: { externalId: apiTeam.id },
         create: {
           externalId: apiTeam.id,
-          name: apiTeam.name,
-          shortName: apiTeam.shortName,
+          name: translatedName,
+          shortName: translatedShortName,
           tla: apiTeam.tla,
           crestUrl: apiTeam.crest,
         },
         update: {
-          name: apiTeam.name,
-          shortName: apiTeam.shortName,
+          name: translatedName,
+          shortName: translatedShortName,
           tla: apiTeam.tla,
           crestUrl: apiTeam.crest,
         },
