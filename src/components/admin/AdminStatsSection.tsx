@@ -25,10 +25,10 @@ export function AdminStatsSection({
   const handleRecalcAll = () => {
     startTransition(async () => {
       const result = await recalculateAllPoints()
-      if (result.ok) {
+      if (result.ok && "matchesProcessed" in result) {
         alert(`Recalcul OK : ${result.matchesProcessed} matchs, ${result.totalUpdated} pronos`)
       } else {
-        alert(`Erreur : ${result.error}`)
+        alert(`Erreur : ${"error" in result ? result.error : "Inconnue"}`)
       }
     })
   }
