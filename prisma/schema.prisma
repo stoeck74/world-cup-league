@@ -19,6 +19,12 @@ model User {
   bio                String?
   favoriteTeamId     String?
   favoritePlayer     String?
+  goldenBoot1stPlayerId  String?
+  goldenBoot1stPlayer    Player?  @relation("GoldenBoot1st", fields: [goldenBoot1stPlayerId], references: [id], onDelete: SetNull)
+  goldenBoot2ndPlayerId  String?
+  goldenBoot2ndPlayer    Player?  @relation("GoldenBoot2nd", fields: [goldenBoot2ndPlayerId], references: [id], onDelete: SetNull)
+  goldenBoot3rdPlayerId  String?
+  goldenBoot3rdPlayer    Player?  @relation("GoldenBoot3rd", fields: [goldenBoot3rdPlayerId], references: [id], onDelete: SetNull)
   role               UserRole         @default(USER)
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
@@ -65,6 +71,7 @@ model Team {
   homeMatches      Match[]  @relation("HomeTeam")
   qualifiedMatches Match[]  @relation("QualifierTeam")
   fans             User[]
+    players      Player[]
   predictionQualifiers Prediction[] @relation("PredictionQualifier")
 }
 
@@ -163,4 +170,27 @@ enum MatchStatus {
   LIVE
   FINISHED
   POSTPONED
+}
+
+model Player {
+  id          String    @id @default(cuid())
+  externalId  Int       @unique             // ID API football-data.org
+  name        String
+  position    String?                       // "Defence" / "Midfield" / "Offence" (pas de Goalkeeper)
+  dateOfBirth DateTime?
+  nationality String?
+
+  // Équipe d'appartenance pendant le tournoi
+  teamId      String
+  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  // Reverse relations pour les 3 pronos Soulier d'Or
+  goldenBoot1stPredictions  User[]  @relation("GoldenBoot1st")
+  goldenBoot2ndPredictions  User[]  @relation("GoldenBoot2nd")
+  goldenBoot3rdPredictions  User[]  @relation("GoldenBoot3rd")
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([teamId])
 }

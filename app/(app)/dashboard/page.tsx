@@ -3,6 +3,8 @@ import { ArrowRight, TrendUp, Trophy } from "@phosphor-icons/react/dist/ssr"
 import Link from "next/link"
 import { DashboardChart } from "@/components/dashboard/DashboardChart"
 import { PositionPop } from "@/components/dashboard/PositionPop"
+import { getUserGoldenBootPredictions, getGoldenBootStatus } from "@/lib/actions/golden-boot"
+import { GoldenBootCard } from "@/components/dashboard/GoldenBootCard"
 
 import {
   getCurrentStage,
@@ -13,6 +15,7 @@ import {
   getMyLastResults,
   getPointsLastStage,
   getChartData,
+  
 } from "@/lib/dashboard-data"
 
 export default async function DashboardPage() {
@@ -23,24 +26,28 @@ export default async function DashboardPage() {
 
   // Charge toutes les données en parallèle (plus rapide)
 const [
-    currentStage,
-    stats,
-    position,
-    upcomingMatches,
-    leaderboardTop,
-    lastResults,
-    pointsLastStage,
-    chartData,
-  ] = await Promise.all([
-    getCurrentStage(userId),
-    getUserStats(userId),
-    getUserPosition(userId),
-    getUpcomingMatches(4, userId),
-    getLeaderboardTop(userId, 5),
-    getMyLastResults(userId, 5),
-    getPointsLastStage(userId),
-    getChartData(userId),
-  ])
+  currentStage,
+  stats,
+  position,
+  upcomingMatches,
+  leaderboardTop,
+  lastResults,
+  pointsLastStage,
+  chartData,
+  goldenBootStatus,
+  goldenBootPredictions,
+] = await Promise.all([
+  getCurrentStage(userId),
+  getUserStats(userId),
+  getUserPosition(userId),
+  getUpcomingMatches(4, userId),
+  getLeaderboardTop(userId, 5),
+  getMyLastResults(userId, 5),
+  getPointsLastStage(userId),
+  getChartData(userId),
+  getGoldenBootStatus(),
+  getUserGoldenBootPredictions(session.user.username),
+])
   return (
     <div className="relative bg-dashboard h-full p-4 md:p-6 lg:p-8 overflow-hidden">
       <div className="max-w-[1400px] mx-auto">
@@ -202,13 +209,8 @@ const [
         {/* Ligne 2 — Graph + Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative">
 
-          {/* GRAPH (à adapter en V2 pour la CDM) */}
-          <div className="lg:col-span-6 min-w-0">
-            <DashboardChart data={chartData} />
-          </div>
-
           {/* MES STATS */}
-          <div className="lg:col-span-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
+          <div className="lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
             <div className="mb-6">
               <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
                 Mondial 2026
@@ -257,70 +259,40 @@ const [
             </div>
           </div>
 
+
+
+
+          {/* GRAPH (à adapter en V2 pour la CDM) */}
+          <div className="lg:col-span-8 min-w-0">
+            <DashboardChart data={chartData} />
+          </div>
+
+
+
         </div>
 
         {/* Ligne 3 — Matchs à venir + Top + Derniers résultats */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4 relative">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative">
+          <div className="lg:col-span-3">
+          <GoldenBootCard
+ initialPicks={
+            goldenBootPredictions.ok && goldenBootPredictions.predictions
+              ? {
+                  first: goldenBootPredictions.predictions.first,
+                  second: goldenBootPredictions.predictions.second,
+                  third: goldenBootPredictions.predictions.third,
+                }
+              : { first: null, second: null, third: null }
+          
+          }
+          isLocked={goldenBootStatus.ok ? goldenBootStatus.locked : false}
+        />
+        </div>
 
-          {/* MATCHS À PRONOSTIQUER */}
-          <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
-                  À venir
-                </p>
-                <h3 className="text-xl font-bold text-text-primary">
-                  Matchs à pronostiquer
-                </h3>
-              </div>
-              <Link
-                href="/matchs"
-                className="text-sm text-accent hover:underline flex items-center gap-1"
-              >
-                Voir tout
-                <ArrowRight size={14} weight="bold" />
-              </Link>
-            </div>
 
-            <div className="space-y-3">
-              {upcomingMatches.length === 0 ? (
-                <p className="text-sm text-text-muted text-center py-4">
-                  Aucun match à venir
-                </p>
-              ) : (
-                upcomingMatches.map((match) => (
-                  <div
-                    key={match.id}
-                    className="flex items-center justify-center py-3 border-b border-white/5 last:border-b-0"
-                  >
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-
-                      <span className="text-sm font-medium text-text-primary truncate">
-                        {match.homeTeamName}
-                      </span>
-                    </div>
-
-                    <div className="px-2 text-xs text-text-muted">vs</div>
-
-                    <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-                      <span className="text-sm font-medium text-text-primary truncate text-right">
-                        {match.awayTeamName}
-                      </span>
-
-                    </div>
-
-                    <div className="ml-3 text-xs text-text-muted text-right shrink-0 hidden sm:block">
-                      <p>{match.kickoffDate.split(" ")[0]}</p>
-                      <p className="text-text-secondary font-medium">{match.kickoffTime}</p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
 
           {/* TOP CLASSEMENT */}
-          <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
+          <div className=" lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
@@ -393,7 +365,7 @@ const [
           </div>
 
           {/* DERNIERS RÉSULTATS */}
-          <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8 relative">
+          <div className="lg:col-span-5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8 relative">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
@@ -456,6 +428,64 @@ const [
             </div>
           </div>
 
+        </div>
+        <div className="grid grid-cols-12">
+                    {/* MATCHS À PRONOSTIQUER */}
+          <div className=" lg:col-span-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
+                  À venir
+                </p>
+                <h3 className="text-xl font-bold text-text-primary">
+                  Matchs à pronostiquer
+                </h3>
+              </div>
+              <Link
+                href="/matchs"
+                className="text-sm text-accent hover:underline flex items-center gap-1"
+              >
+                Voir tout
+                <ArrowRight size={14} weight="bold" />
+              </Link>
+            </div>
+
+            <div className="space-y-3 ">
+              {upcomingMatches.length === 0 ? (
+                <p className="text-sm text-text-muted text-center py-4">
+                  Aucun match à venir
+                </p>
+              ) : (
+                upcomingMatches.map((match) => (
+                  <div
+                    key={match.id}
+                    className="flex items-center justify-center py-3 border-b border-white/5 last:border-b-0"
+                  >
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+
+                      <span className="text-sm font-medium text-text-primary truncate">
+                        {match.homeTeamName}
+                      </span>
+                    </div>
+
+                    <div className="px-2 text-xs text-text-muted">vs</div>
+
+                    <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
+                      <span className="text-sm font-medium text-text-primary truncate text-right">
+                        {match.awayTeamName}
+                      </span>
+
+                    </div>
+
+                    <div className="ml-3 text-xs text-text-muted text-right shrink-0 hidden sm:block">
+                      <p>{match.kickoffDate.split(" ")[0]}</p>
+                      <p className="text-text-secondary font-medium">{match.kickoffTime}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
 
       </div>

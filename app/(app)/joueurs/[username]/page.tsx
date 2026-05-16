@@ -9,6 +9,8 @@ import { ProfileFavoritePlayer } from "@/components/profile/ProfileFavoritePlaye
 import { ProfileFavoriteTeam } from "@/components/profile/ProfileFavoriteTeam"
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar"
 import { ProfileSecurityForm } from "@/components/profile/ProfileSecurityForm"
+import { getUserGoldenBootPredictions } from "@/lib/actions/golden-boot"
+import { ProfileGoldenBoot } from "@/components/profile/ProfileGoldenBoot"
 
 
 // ============================================
@@ -48,6 +50,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const upcomingPredictions = isOwnProfile
     ? await getUserUpcomingPredictions(user.id)
     : []
+    // Pronos Soulier d'Or (visibles par tous)
+  const goldenBootPredictions = await getUserGoldenBootPredictions(username)
   // Récupérer les 18 équipes pour le dropdown (uniquement si c'est ton profil)
 const allTeams = await prisma.team.findMany({
   orderBy: { shortName: "asc" },
@@ -198,6 +202,17 @@ const allTeams = await prisma.team.findMany({
 
 </section>
 
+<section className="py-12">
+{goldenBootPredictions.ok && goldenBootPredictions.predictions && (
+  <ProfileGoldenBoot
+    picks={{
+      first: goldenBootPredictions.predictions.first,
+      second: goldenBootPredictions.predictions.second,
+      third: goldenBootPredictions.predictions.third,
+    }}
+  />
+)}
+</section>
           {/* ============================================
               PRONOS PASSÉS
               ============================================ */}
