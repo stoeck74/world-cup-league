@@ -14,7 +14,7 @@ export function ScoreInput({
   value,
   onChange,
   disabled = false,
-  max = 9,
+  max = 99,
 }: ScoreInputProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isEditing, setIsEditing] = useState(false)

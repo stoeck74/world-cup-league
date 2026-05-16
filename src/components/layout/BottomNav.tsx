@@ -7,7 +7,7 @@ import {
   SoccerBall,
   Trophy,
   UsersThree,
-  UserCircle,
+ QuestionMark,
 } from "@phosphor-icons/react"
 
 type NavItem = {
@@ -21,7 +21,7 @@ const navItems: NavItem[] = [
   { label: "Matchs", href: "/matchs", icon: SoccerBall },
   { label: "Classement", href: "/classement", icon: Trophy },
   { label: "Joueurs", href: "/joueurs", icon: UsersThree },
-  { label: "Profil", href: "/settings", icon: UserCircle },
+  { label: "Aide", href: "/aide", icon: QuestionMark },
 ]
 
 export function BottomNav() {
@@ -31,7 +31,7 @@ export function BottomNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-bg-elevated/95 backdrop-blur-xl border-t border-border">
-      <div className="flex items-center justify-around h-16 px-2">
+      <div className="flex items-center justify-around h-20 px-2">
         {navItems.map((item) => {
           const Icon = item.icon
           const active = isActive(item.href)
