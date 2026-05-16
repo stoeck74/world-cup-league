@@ -101,6 +101,14 @@ for (const apiTeam of apiTeams) {
     const allTeams = await prisma.team.findMany()
     const teamIdByExternalId = new Map(allTeams.map((t) => [t.externalId, t.id]))
 
+// OPTIM : récupère tous les matchs existants en UNE seule query
+    const existingMatches = await prisma.match.findMany({
+      select: { externalId: true, status: true },
+    })
+    const statusByExternalId = new Map(
+      existingMatches.map((m) => [m.externalId, m.status])
+    )
+
     let matchesUpserted = 0
     let matchesNewlyFinished = 0
     for (const apiMatch of apiMatches) {
@@ -113,12 +121,9 @@ for (const apiTeam of apiTeams) {
 
       const newStatus = mapMatchStatus(apiMatch.status)
 
-      // Détecte les matchs qui viennent de passer en FINISHED
-      const existing = await prisma.match.findUnique({
-        where: { externalId: apiMatch.id },
-        select: { status: true },
-      })
-      if (existing && existing.status !== "FINISHED" && newStatus === "FINISHED") {
+      // Détecte les matchs qui viennent de passer en FINISHED (sans query DB)
+      const previousStatus = statusByExternalId.get(apiMatch.id)
+      if (previousStatus && previousStatus !== "FINISHED" && newStatus === "FINISHED") {
         matchesNewlyFinished++
       }
 
