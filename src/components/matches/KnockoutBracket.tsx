@@ -2,27 +2,9 @@
 
 import { useState, useEffect, useRef } from "react"
 import { gsap } from "gsap"
-import { MatchCard } from "./MatchCard"
-import { savePrediction } from "@/lib/actions/predictions"
-import {
-  fakeRound32Matches,
-  fakeRound16Matches,
-  fakeQuarterMatches,
-  fakeSemiMatches,
-  fakeFinalMatches,
-  fakeThirdPlaceMatches,
-  type FakeMatchDetailed,
-} from "@/lib/fake-data/matches"
-
-// ============================================
-// KNOCKOUT BRACKET — Coupe du Monde 2026
-//
-// 2 sous-onglets :
-//  - "1/16e de finale" : grid avec MatchCard complet
-//  - "Tableau final" : bracket symétrique 6 colonnes
-// ============================================
-
-type SubTab = "R32" | "BRACKET"
+import { CompactMatchCard } from "./CompactMatchCard"
+import { MatchPredictionModal } from "./MatchPredictionModal"
+import { type FakeMatchDetailed } from "@/lib/fake-data/matches"
 
 type PredictionEntry = {
   home: number | null
@@ -30,68 +12,43 @@ type PredictionEntry = {
   qualifier: string | null
 }
 
-export function KnockoutBracket() {
-  const [subTab, setSubTab] = useState<SubTab>("R32")
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  // State des pronos partagé R32 + bracket
-const [predictions, setPredictions] = useState<Map<string, PredictionEntry>>(new Map())
-  const dirtyMatchIds = useRef<Set<string>>(new Set())
-  const debounceTimers = useRef<Map<string, NodeJS.Timeout>>(new Map())
-  const [justSavedIds, setJustSavedIds] = useState<Set<string>>(new Set())
-
-  const performSave = async (matchId: string) => {
-    const pred = predictions.get(matchId)
-    if (!pred) return
-    const result = await savePrediction(matchId, pred.home, pred.away, pred.qualifier)
-    if (result.ok) {
-      dirtyMatchIds.current.delete(matchId)
-      setJustSavedIds((prev) => new Set(prev).add(matchId))
-      setTimeout(() => {
-        setJustSavedIds((prev) => {
-          const next = new Set(prev)
-          next.delete(matchId)
-          return next
-        })
-      }, 1800)
-    } else {
-      console.error("Save failed:", result.error)
-    }
-  }
-
-  const handlePredictionChange = (
+type KnockoutBracketProps = {
+  matches: FakeMatchDetailed[]
+  predictions: Map<string, PredictionEntry>
+  onPredictionChange: (
     matchId: string,
     home: number | null,
     away: number | null,
     qualifier: string | null
-  ) => {
-    setPredictions((prev) => {
-      const next = new Map(prev)
-      next.set(matchId, { home, away, qualifier })
-      return next
-    })
+  ) => void
+  onLeaveCard: (matchId: string) => void
+  justSavedIds: Set<string>
+  savedIds: Set<string>
+}
 
-    dirtyMatchIds.current.add(matchId)
-    const existing = debounceTimers.current.get(matchId)
-    if (existing) clearTimeout(existing)
-    const timer = setTimeout(() => {
-      performSave(matchId)
-      debounceTimers.current.delete(matchId)
-    }, 1500)
-    debounceTimers.current.set(matchId, timer)
-  }
+type SubTab = "R32" | "BRACKET"
 
-  const handleLeaveCard = (matchId: string) => {
-    if (!dirtyMatchIds.current.has(matchId)) return
-    const existing = debounceTimers.current.get(matchId)
-    if (existing) {
-      clearTimeout(existing)
-      debounceTimers.current.delete(matchId)
-    }
-    performSave(matchId)
-  }
+export function KnockoutBracket({
+  matches,
+  predictions,
+  onPredictionChange,
+  onLeaveCard,
+  justSavedIds,
+  savedIds,
+}: KnockoutBracketProps) {
+  const [subTab, setSubTab] = useState<SubTab>("R32")
+  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  // Animations
+  // Filtre par stage
+  const round32 = matches.filter((m) => m.stage === "ROUND_32")
+  const round16 = matches.filter((m) => m.stage === "ROUND_16")
+  const quarters = matches.filter((m) => m.stage === "QUARTER")
+  const semis = matches.filter((m) => m.stage === "SEMI")
+  const thirdPlace = matches.filter((m) => m.stage === "THIRD_PLACE")
+  const finals = matches.filter((m) => m.stage === "FINAL")
+
+  // Animation
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -99,13 +56,34 @@ const [predictions, setPredictions] = useState<Map<string, PredictionEntry>>(new
     gsap.set(cards, { opacity: 0, y: 16 })
     gsap.to(cards, {
       opacity: 1, y: 0,
-      duration: 0.4, stagger: 0.02,
+      duration: 0.4, stagger: 0.015,
       ease: "power3.out", delay: 0.1,
     })
   }, [subTab])
 
+  const selectedMatch = selectedMatchId
+    ? matches.find((m) => m.id === selectedMatchId) ?? null
+    : null
+
+  const renderCard = (match: FakeMatchDetailed) => {
+    const pred = predictions.get(match.id) ?? { home: null, away: null, qualifier: null }
+    return (
+      <div key={match.id} data-bracket-card>
+        <CompactMatchCard
+          match={match}
+          homePrediction={pred.home}
+          awayPrediction={pred.away}
+          qualifierPrediction={pred.qualifier}
+          justSaved={justSavedIds.has(match.id)}
+          isSaved={savedIds.has(match.id)}
+          onClick={() => setSelectedMatchId(match.id)}
+        />
+      </div>
+    )
+  }
+
   return (
-    <div>
+    <>
       {/* Sous-onglets */}
       <div className="mb-6 flex gap-2">
         <button
@@ -132,224 +110,208 @@ const [predictions, setPredictions] = useState<Map<string, PredictionEntry>>(new
             }
           `}
         >
-          Tableau final
+          Phase finale
         </button>
       </div>
 
-      {/* Contenu */}
       <div ref={containerRef}>
-{subTab === "R32" ? (
-          <Round32Grid
-            matches={fakeRound32Matches}
-            predictions={predictions}
-            onPredictionChange={handlePredictionChange}
-            onLeaveCard={handleLeaveCard}
-            justSavedIds={justSavedIds}
-          />
-        ) : (
-          <FinalBracket
-            predictions={predictions}
-            onPredictionChange={handlePredictionChange}
-            onLeaveCard={handleLeaveCard}
-            justSavedIds={justSavedIds}
-          />
+
+        {/* ============================================
+            1/16e — Grid 4 cols
+            ============================================ */}
+        {subTab === "R32" && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {round32.map(renderCard)}
+          </div>
         )}
-      </div>
-    </div>
-  )
-}
 
-// ============================================
-// 1/16e DE FINALE — Grid
-// ============================================
-function Round32Grid({
-  matches,
-  predictions,
-  onPredictionChange,
-  onLeaveCard,
-  justSavedIds,
-}: {
-  matches: FakeMatchDetailed[]
-  predictions: Map<string, PredictionEntry>
-  onPredictionChange: (
-    matchId: string,
-    home: number | null,
-    away: number | null,
-    qualifier: string | null
-  ) => void
-  onLeaveCard: (matchId: string) => void
-  justSavedIds: Set<string>
-}) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-      {matches.map((match) => {
-        const pred = predictions.get(match.id) ?? { home: null, away: null, qualifier: null }
-        return (
-          <div key={match.id} data-bracket-card>
-            <MatchCard
-              match={match}
-              homePrediction={pred.home}
-              awayPrediction={pred.away}
-              qualifierPrediction={pred.qualifier}
-              stageStatus="current"
-              onPredictionChange={onPredictionChange}
-              onLeaveCard={onLeaveCard}
-              justSaved={justSavedIds.has(match.id)}
-            />
-          </div>
-        )
-      })}
-    </div>
-  )
-}
+        {/* ============================================
+            BRACKET
+            Mobile (<md) : sections empilées
+            Desktop (md+) : bracket symétrique 6 cols
+            ============================================ */}
+        {subTab === "BRACKET" && (
+          <>
+            {/* ========== MOBILE : sections empilées ========== */}
+            <div className="md:hidden space-y-8">
 
-// ============================================
-// TABLEAU FINAL — Bracket symétrique 6 colonnes
-// ============================================
-function FinalBracket({
-  predictions,
-  onPredictionChange,
-  onLeaveCard,
-  justSavedIds,
-}: {
-  predictions: Map<string, PredictionEntry>
-  onPredictionChange: (
-    matchId: string,
-    home: number | null,
-    away: number | null,
-    qualifier: string | null
-  ) => void
-  onLeaveCard: (matchId: string) => void
-  justSavedIds: Set<string>
-}) {
-  const round16Left = fakeRound16Matches.filter((m) =>
-    ["r16-89", "r16-90", "r16-93", "r16-94"].includes(m.id)
-  )
-  const quarterLeft = fakeQuarterMatches.filter((m) => ["qf-97", "qf-98"].includes(m.id))
-  const semiLeft = fakeSemiMatches.find((m) => m.id === "sf-101")
+              {/* 1/8e */}
+              <section>
+                <p className="text-xs uppercase tracking-widest text-text-muted mb-3">
+                  1/8e de finale · {round16.length} matchs
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {round16.map(renderCard)}
+                </div>
+              </section>
 
-  const round16Right = fakeRound16Matches.filter((m) =>
-    ["r16-91", "r16-92", "r16-95", "r16-96"].includes(m.id)
-  )
-  const quarterRight = fakeQuarterMatches.filter((m) => ["qf-99", "qf-100"].includes(m.id))
-  const semiRight = fakeSemiMatches.find((m) => m.id === "sf-102")
+              {/* Quarts */}
+              <section>
+                <p className="text-xs uppercase tracking-widest text-text-muted mb-3">
+                  Quarts de finale · {quarters.length} matchs
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {quarters.map(renderCard)}
+                </div>
+              </section>
 
-  const renderMatch = (match: FakeMatchDetailed) => {
-    const pred = predictions.get(match.id) ?? { home: null, away: null, qualifier: null }
-    return (
-      <div data-bracket-card>
-            <MatchCard
-              match={match}
-              homePrediction={pred.home}
-              awayPrediction={pred.away}
-              qualifierPrediction={pred.qualifier}
-              stageStatus="current"
-              onPredictionChange={onPredictionChange}
-              onLeaveCard={onLeaveCard}
-              justSaved={justSavedIds.has(match.id)}
-            />
-      </div>
-    )
-  }
+              {/* Demis */}
+              <section>
+                <p className="text-xs uppercase tracking-widest text-text-muted mb-3">
+                  Demi-finales · {semis.length} matchs
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {semis.map(renderCard)}
+                </div>
+              </section>
 
-  return (
-    <>
-      {/* Grid 6 colonnes pleine largeur */}
-      <div className="grid grid-cols-6 gap-3 md:gap-4">
+              {/* Finale */}
+              <section>
+                <p className="text-xs uppercase tracking-widest font-bold text-accent mb-3 text-center">
+                  Finale
+                </p>
+                <div className="max-w-xs mx-auto">
+                  {finals.map(renderCard)}
+                </div>
+              </section>
 
-        {/* Col 1 : 1/8e GAUCHE */}
-        <div className="flex flex-col">
-          <p className="text-[10px] uppercase tracking-widest font-bold mb-3 text-center text-text-muted">
-            1/8e
-          </p>
-          <div className="flex flex-col gap-3">
-            {round16Left.map((m) => (
-              <div key={m.id}>{renderMatch(m)}</div>
-            ))}
-          </div>
-        </div>
+              {/* 3e place */}
+              {thirdPlace.length > 0 && (
+                <section>
+                  <p className="text-xs uppercase tracking-widest text-text-muted mb-3 text-center">
+                    3e place
+                  </p>
+                  <div className="max-w-xs mx-auto">
+                    {thirdPlace.map(renderCard)}
+                  </div>
+                </section>
+              )}
 
-        {/* Col 2 : Quarts GAUCHE */}
-        <div className="flex flex-col">
-          <p className="text-[10px] uppercase tracking-widest font-bold mb-3 text-center text-text-muted">
-            Quarts
-          </p>
-          <div className="flex flex-col justify-around flex-1 gap-3">
-            {quarterLeft.map((m) => (
-              <div key={m.id}>{renderMatch(m)}</div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* Col 3 : Demi GAUCHE */}
-        <div className="flex flex-col">
-          <p className="text-[10px] uppercase tracking-widest font-bold mb-3 text-center text-text-muted">
-            Demi
-          </p>
-          <div className="flex flex-col justify-center flex-1">
-            {semiLeft && <div key={semiLeft.id}>{renderMatch(semiLeft)}</div>}
-          </div>
-        </div>
+{/* ========== DESKTOP : bracket symétrique 6 cols ========== */}
+            <div className="hidden md:block">
 
-        {/* Col 4 : Demi DROITE */}
-        <div className="flex flex-col">
-          <p className="text-[10px] uppercase tracking-widest font-bold mb-3 text-center text-text-muted">
-            Demi
-          </p>
-          <div className="flex flex-col justify-center flex-1">
-            {semiRight && <div key={semiRight.id}>{renderMatch(semiRight)}</div>}
-          </div>
-        </div>
+              {/* Header colonnes */}
+              <div className="grid grid-cols-6 gap-3 mb-3">
+                <p className="text-[10px] uppercase tracking-widest text-text-muted text-center">1/8e</p>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted text-center">Quarts</p>
+                <p className="col-span-2 text-[10px] uppercase tracking-widest text-text-muted text-center">Demi · Finale</p>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted text-center">Quarts</p>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted text-center">1/8e</p>
+              </div>
 
-        {/* Col 5 : Quarts DROITE */}
-        <div className="flex flex-col">
-          <p className="text-[10px] uppercase tracking-widest font-bold mb-3 text-center text-text-muted">
-            Quarts
-          </p>
-          <div className="flex flex-col justify-around flex-1 gap-3">
-            {quarterRight.map((m) => (
-              <div key={m.id}>{renderMatch(m)}</div>
-            ))}
-          </div>
-        </div>
+              <div
+                className="grid grid-cols-6 gap-3"
+                style={{ minHeight: "calc(100vh - 380px)" }}
+              >
+                {/* Col 1 : 1/8e GAUCHE — 4 cards en 4 zones égales */}
+                <div className="flex flex-col">
+                  {round16.slice(0, 4).map((m) => (
+                    <div key={m.id} className="flex-1 flex items-center">
+                      <div className="w-full">{renderCard(m)}</div>
+                    </div>
+                  ))}
+                </div>
+ {/* Col 2 : 1/4 GAUCHE — col divisée en 2 (50% chacune),
+                    quart centré verticalement dans sa moitié */}
+                <div className="flex flex-col h-full">
+                  <div className="h-1/2 flex items-center">
+                    <div className="w-full">
+                      {quarters.slice(0, 1).map(renderCard)}
+                    </div>
+                  </div>
+                  <div className="h-1/2 flex items-center">
+                    <div className="w-full">
+                      {quarters.slice(1, 2).map(renderCard)}
+                    </div>
+                  </div>
+                </div>
 
-        {/* Col 6 : 1/8e DROITE */}
-        <div className="flex flex-col">
-          <p className="text-[10px] uppercase tracking-widest font-bold mb-3 text-center text-text-muted">
-            1/8e
-          </p>
-          <div className="flex flex-col gap-3">
-            {round16Right.map((m) => (
-              <div key={m.id}>{renderMatch(m)}</div>
-            ))}
-          </div>
-        </div>
+{/* Col 3+4 : Zone centrale.
+                    Les demis sont alignées sur les quarts (au milieu vertical).
+                    La finale et la 3e place dépassent dessous. */}
+                <div className="col-span-2 flex flex-col h-full">
 
-      </div>
+                  {/* Demis : positionnées au milieu vertical (50%)
+                      Le wrapper h-1/2 + items-end pousse les demis au bord bas
+                      = donc leur centre est à 50% */}
+                   <div className="h-1/2 flex items-end">
+                    <div className="grid grid-cols-2 gap-3 w-full">
+                      {semis.slice(0, 1).map(renderCard)}
+                      {semis.slice(1, 2).map(renderCard)}
+                    </div>
+                  </div>
 
-      {/* Finale — col 3+4 sous le bracket */}
-      <div className="grid grid-cols-6 gap-3 md:gap-4 mt-6">
-        <div className="col-start-3 col-span-2 flex flex-col">
-          <p className="text-[10px] uppercase tracking-widest font-bold mb-3 text-center text-accent">
-            Finale
-          </p>
-          {fakeFinalMatches.map((m) => (
-            <div key={m.id}>{renderMatch(m)}</div>
-          ))}
-        </div>
+                  {/* Finale + 3e place : dans la moitié basse, alignées en haut */}
+                  <div className="h-1/2 flex flex-col items-center pt-4 gap-3">
+
+                    {/* Finale w-2/3 centrée */}
+                    <div className="w-2/3 flex flex-col gap-2">
+                      <p className="text-[10px] uppercase tracking-widest font-bold text-accent text-center">
+                        Finale
+                      </p>
+                      {finals.map(renderCard)}
+                    </div>
+
+                    {/* 3e place w-2/3 centrée */}
+                    {thirdPlace.length > 0 && (
+                      <div className="w-2/3 flex flex-col gap-2">
+                        <p className="text-[10px] uppercase tracking-widest text-text-muted text-center">
+                          3e place
+                        </p>
+                        {thirdPlace.map(renderCard)}
+                      </div>
+                    )}
+
+                  </div>
+
+                </div>
+                {/* Col 5 : 1/4 DROITE — col divisée en 2 (50% chacune),
+                    quart centré verticalement dans sa moitié */}
+                <div className="flex flex-col h-full">
+                  <div className="h-1/2 flex items-center">
+                    <div className="w-full">
+                      {quarters.slice(2, 3).map(renderCard)}
+                    </div>
+                  </div>
+                  <div className="h-1/2 flex items-center">
+                    <div className="w-full">
+                      {quarters.slice(3, 4).map(renderCard)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Col 6 : 1/8e DROITE — 4 cards en 4 zones égales */}
+                <div className="flex flex-col">
+                  {round16.slice(4, 8).map((m) => (
+                    <div key={m.id} className="flex-1 flex items-center">
+                      <div className="w-full">{renderCard(m)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </>
+        )}
+
       </div>
 
-      {/* Petite finale */}
-      <div className="mt-8 pt-6 border-t border-white/5 flex justify-center">
-        <div className="w-full max-w-md">
-          <p className="text-xs uppercase tracking-widest text-text-muted mb-2 text-center">
-            Petite finale (3e place)
-          </p>
-          {fakeThirdPlaceMatches.map((m) => (
-            <div key={m.id}>{renderMatch(m)}</div>
-          ))}
-        </div>
-      </div>
+      {/* MODAL */}
+      {selectedMatch && (
+        <MatchPredictionModal
+          match={selectedMatch}
+          homePrediction={predictions.get(selectedMatch.id)?.home ?? null}
+          awayPrediction={predictions.get(selectedMatch.id)?.away ?? null}
+          qualifierPrediction={predictions.get(selectedMatch.id)?.qualifier ?? null}
+          justSaved={justSavedIds.has(selectedMatch.id)}
+          isSaved={savedIds.has(selectedMatch.id)}
+          onPredictionChange={onPredictionChange}
+          onLeaveCard={onLeaveCard}
+          onClose={() => setSelectedMatchId(null)}
+        />
+      )}
     </>
   )
 }

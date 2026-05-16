@@ -161,12 +161,11 @@ export async function calculatePointsForMatch(matchId: string) {
  * Recalcule TOUS les pronos de TOUS les matchs FINISHED.
  * À utiliser pour un resync complet (par exemple après changement de règle).
  */
-export async function calculateAllPoints() {
-  const session = await auth()
-  if (session?.user?.role !== "ADMIN") {
-    return { ok: false, error: "Accès admin requis" }
-  }
-
+/**
+ * Recalcule TOUS les points de TOUS les matchs FINISHED.
+ * Version INTERNE (sans auth) — utilisée par la route sync.
+ */
+export async function calculateAllPointsInternal() {
   const finishedMatches = await prisma.match.findMany({
     where: {
       status: "FINISHED",
@@ -185,4 +184,15 @@ export async function calculateAllPoints() {
   }
 
   return { ok: true, matchesProcessed: finishedMatches.length, totalUpdated }
+}
+
+/**
+ * Version PUBLIQUE (avec check admin) — utilisée depuis l'admin UI.
+ */
+export async function calculateAllPoints() {
+  const session = await auth()
+  if (session?.user?.role !== "ADMIN") {
+    return { ok: false, error: "Accès admin requis" }
+  }
+  return calculateAllPointsInternal()
 }

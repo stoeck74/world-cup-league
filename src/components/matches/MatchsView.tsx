@@ -303,7 +303,14 @@ export function MatchsView({
               )}
             </div>
           ) : (
-            <KnockoutBracket />
+            <KnockoutBracket
+              matches={matches}
+              predictions={predictions}
+              onPredictionChange={handlePredictionChange}
+              onLeaveCard={handleLeaveCard}
+              justSavedIds={justSavedIds}
+              savedIds={savedIds}
+            />
           )}
         </div>
 
