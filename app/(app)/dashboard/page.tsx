@@ -8,6 +8,8 @@ import { GoldenBootCard } from "@/components/dashboard/GoldenBootCard"
 import { HeroProgressBar } from "@/components/dashboard/HeroProgressBar"
 import { SuccessRateCard } from "@/components/dashboard/SuccessRateCard"
 import { ExactScoresCard } from "@/components/dashboard/ExactScoresCard"
+import { buildAvatarUrl } from "@/lib/avatar"
+
 
 
 
@@ -273,12 +275,11 @@ const [
                     `}>
                       {player.position}.
                     </span>
-
-                    <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                      <span className="text-xs font-bold uppercase text-text-secondary">
-                        {player.username[0]}
-                      </span>
-                    </div>
+                    <img
+                      src={buildAvatarUrl(player.avatarStyle, player.avatarSeed, player.username)}
+                      alt={player.username}
+                      className="w-8 h-8 rounded-full bg-lime-500/30 border border-white/10 shrink-0"
+                    />
 
                     <span className={`
                       flex-1 text-sm font-medium truncate

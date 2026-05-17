@@ -16,8 +16,7 @@ const STYLES = [
   { id: "personas", label: "Personas" },
 ]
 
-const buildAvatarUrl = (style: string, seed: string) =>
-  `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}`
+import { buildAvatarUrl as buildAvatarUrlShared } from "@/lib/avatar"
 
 const randomSeed = () => Math.random().toString(36).slice(2, 12)
 
@@ -40,7 +39,7 @@ export function ProfileAvatar({ initialStyle, initialSeed, username, isOwnProfil
     return () => document.removeEventListener("mousedown", handleClick)
   }, [isOpen])
 
-  const avatarUrl = buildAvatarUrl(style, seed)
+  const avatarUrl = buildAvatarUrlShared(style, seed, username)
 
   const handleShuffle = () => {
     setSeed(randomSeed())

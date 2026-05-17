@@ -304,10 +304,11 @@ export async function getLeaderboardTop(currentUserId: string, limit = 5) {
     position: entry.position,
     username: entry.username,
     points: entry.points,
+    avatarStyle: entry.avatarStyle,
+    avatarSeed: entry.avatarSeed,
     isMe: entry.id === currentUserId,
   }))
 }
-
 /**
  * Points gagnés sur la phase actuelle (les matchs joués récemment).
  * Pour l'instant, on prend les 5 derniers matchs joués du user.
