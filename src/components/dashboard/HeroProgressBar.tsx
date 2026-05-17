@@ -58,7 +58,7 @@ export function HeroProgressBar({ predictionsMade, matchesCount }: HeroProgressB
       <div className="relative h-1.5 rounded-full bg-white/10 overflow-hidden">
         <div
           ref={fillRef}
-          className="absolute inset-y-0 left-0 bg-accent rounded-full"
+          className="absolute inset-y-0 left-0 bg-lime-300 rounded-full"
           style={{ width: "0%" }}
         />
       </div>

@@ -1,5 +1,5 @@
 "use client"
-
+import { TrendUp } from "@phosphor-icons/react"
 import { useState } from "react"
 import {
   ResponsiveContainer,
@@ -48,21 +48,21 @@ const trends: TrendConfig[] = [
     label: "Points",
     description: "Points marqués par jour",
     type: "bar",
-    color: "#2196f3",
+    color: "#84cc16",
   },
   {
     key: "cumulative",
     label: "Cumul",
     description: "Total points cumulés",
     type: "area",
-    color: "#2196f3",
+    color: "#84cc16",
   },
   {
     key: "position",
     label: "Classement",
     description: "Position dans le classement",
     type: "line",
-    color: "#2196f3",
+    color: "#84cc16",
     yAxisInverted: true,
   },
 ]
@@ -88,7 +88,7 @@ function CustomTooltip({ active, payload, trend }: TooltipProps) {
       <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
         {data.label}
       </p>
-      <p className="text-2xl font-bold text-accent">
+      <p className="text-2xl font-bold text-lime-500">
         {trend.key === "position" ? `${value}e` : value}
         {(trend.key === "points" || trend.key === "cumulative") && (
           <span className="text-base text-primary ml-1">pts</span>
@@ -111,9 +111,12 @@ export function DashboardChart({ data }: DashboardChartProps) {
     return (
       <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
         <div className="mb-6">
-          <p className="text-xs uppercase tracking-widest text-text-primary mb-2">
-            Évolution sur le tournoi
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+                    <TrendUp size={36} weight="light" className="text-lime" />
+                    <p className="text-xs uppercase tracking-widest text-text-muted">
+                      Évolution sur le tournoi
+                    </p>
+                  </div>
           <h2 className="text-2xl font-bold text-text-primary">
             Pas encore de données
           </h2>
@@ -154,7 +157,7 @@ export function DashboardChart({ data }: DashboardChartProps) {
               className={`
                 px-4 py-2 rounded-md text-sm font-medium transition-colors
                 ${selectedTrend === t.key
-                  ? "bg-accent text-bg"
+                  ? "bg-lime-600 text-bg"
                   : "text-text-secondary hover:text-text-primary"
                 }
               `}

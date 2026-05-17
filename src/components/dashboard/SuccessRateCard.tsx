@@ -50,7 +50,7 @@ export function SuccessRateCard({ goodResults, totalFinished }: SuccessRateCardP
       {/* Header */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-1">
-          <ChartDonut size={18} weight="bold" className="text-accent" />
+          <ChartDonut size={36} weight="light" className="text-lime" />
           <p className="text-xs uppercase tracking-widest text-text-muted">
             Mondial 2026
           </p>

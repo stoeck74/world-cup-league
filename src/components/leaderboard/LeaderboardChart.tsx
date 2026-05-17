@@ -211,7 +211,7 @@ function PodiumCard({
         flex flex-col items-center text-center
         rounded-2xl ${cardPadding}
         ${isFirst
-          ? "bg-gradient-to-br from-blue-400/90 to-blue-600/70 text-bg"
+          ? "bg-gradient-to-br from-lime-300/90 to-lime-600/80 text-bg"
           : "bg-white/[0.04] backdrop-blur-xl border border-white/10"
         }
         ${!isFirst && entry.isMe ? "border-accent/40" : ""}
@@ -265,7 +265,7 @@ function PodiumCard({
         {entry.username}
       </p>
       {entry.isMe && !isFirst && (
-        <span className="text-[9px] uppercase tracking-widest font-bold text-accent mt-1">
+        <span className="text-[9px] uppercase tracking-widest font-bold text-lime mt-1">
           Moi
         </span>
       )}

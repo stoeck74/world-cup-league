@@ -49,23 +49,23 @@ export function MatchsView({
   const dirtyMatchIds = useRef<Set<string>>(new Set())
   const debounceTimers = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
+  // Init une seule fois depuis TOUS les matches (groupe + KO)
   useEffect(() => {
     const newPredictions = new Map<string, { home: number | null; away: number | null; qualifier: string | null }>()
     const initialSaved = new Set<string>()
-    displayedMatches.forEach((m) => {
+    matches.forEach((m) => {
       newPredictions.set(m.id, {
         home: m.myHomePrediction ?? null,
         away: m.myAwayPrediction ?? null,
         qualifier: m.myQualifierPrediction ?? null,
       })
-      // Si le match a déjà un prono en DB, il est marqué comme "saved"
       if (m.myHomePrediction !== null && m.myAwayPrediction !== null) {
         initialSaved.add(m.id)
       }
     })
     setPredictions(newPredictions)
     setSavedIds(initialSaved)
-  }, [displayedMatches])
+  }, [matches])
 
   const performSave = async (matchId: string) => {
     const pred = predictions.get(matchId)

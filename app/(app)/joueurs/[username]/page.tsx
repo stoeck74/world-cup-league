@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { getUserPastPredictions, getUserUpcomingPredictions } from "@/lib/dashboard-data"
 import { getProfileStats } from "@/lib/profile-data"
 import { notFound } from "next/navigation"
-import { Pencil, Trophy, Lightning, Target } from "@phosphor-icons/react/dist/ssr"
+import { Pencil, Trophy, Lightning, Target, ChartLine, Crosshair } from "@phosphor-icons/react/dist/ssr"
+
 import { EditableField } from "@/components/profile/EditableField"
 import { updateFavoritePlayer } from "@/lib/actions/profile"
 import { ProfileFavoritePlayer } from "@/components/profile/ProfileFavoritePlayer"
@@ -95,6 +96,9 @@ const allTeams = await prisma.team.findMany({
     predictionsMade: rawStats.predictionsMade,
     bestScore: rawStats.bestScore,
     bestDayLabel: rawStats.bestDayLabel,
+    successRate: rawStats.successRate,
+    exactScores: rawStats.exactScores,
+    finishedCount: rawStats.finishedCount,
   }
 
   return (
@@ -158,10 +162,10 @@ const allTeams = await prisma.team.findMany({
 
           </section>
 
-          {/* ============================================
-              SECTION STATS — 3 chiffres identitaires
+         {/* ============================================
+              SECTION STATS — 5 chiffres identitaires
               ============================================ */}
-          <section className="grid grid-cols-3 gap-3 md:gap-4">
+          <section className="grid grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
 
             {/* Position */}
             <div className="rounded-2xl bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/10 p-4 md:p-5">
@@ -192,6 +196,39 @@ const allTeams = await prisma.team.findMany({
               </p>
             </div>
 
+            {/* Réussite */}
+            <div className="rounded-2xl bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/10 p-4 md:p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <ChartLine size={14} weight="bold" className="text-accent" />
+                <p className="text-[10px] md:text-xs uppercase tracking-widest text-text-muted">
+                  Réussite
+                </p>
+              </div>
+              {stats.finishedCount > 0 ? (
+                <p className="text-2xl md:text-3xl font-black text-text-primary">
+                  {stats.successRate}
+                  <span className="text-text-muted text-sm font-normal ml-1">%</span>
+                </p>
+              ) : (
+                <p className="text-lg md:text-xl font-bold text-text-muted">
+                  —
+                </p>
+              )}
+            </div>
+
+            {/* Scores exacts */}
+            <div className="rounded-2xl bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/10 p-4 md:p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Crosshair size={14} weight="bold" className="text-accent" />
+                <p className="text-[10px] md:text-xs uppercase tracking-widest text-text-muted">
+                  Exacts
+                </p>
+              </div>
+              <p className="text-2xl md:text-3xl font-black text-text-primary">
+                {stats.exactScores}
+              </p>
+            </div>
+
             {/* Meilleur prono */}
             <div className="rounded-2xl bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/10 p-4 md:p-5">
               <div className="flex items-center gap-2 mb-3">
@@ -214,7 +251,7 @@ const allTeams = await prisma.team.findMany({
               )}
             </div>
 
-</section>
+          </section>
 
 <section className="py-8">
 {goldenBootPredictions.ok && goldenBootPredictions.predictions && (

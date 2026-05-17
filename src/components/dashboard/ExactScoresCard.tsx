@@ -56,7 +56,7 @@ export function ExactScoresCard({ exactScores, totalFinished }: ExactScoresCardP
       {/* Header */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-1">
-          <Target size={14} weight="bold" className="text-accent" />
+          <Target size={36} weight="light" className="text-lime" />
           <p className="text-xs uppercase tracking-widest text-text-muted">
             Précision
           </p>
@@ -68,7 +68,7 @@ export function ExactScoresCard({ exactScores, totalFinished }: ExactScoresCardP
 
       {/* Zone visuelle — chiffre + anneaux qui pulsent au load */}
       <div className="flex-1 flex items-center justify-center py-4">
-        <div className="relative flex items-center justify-center w-full aspect-square max-w-[180px]">
+        <div className="relative flex items-center justify-center w-full aspect-square max-w-[250px]">
           {/* Anneaux */}
           <div
             ref={ring1Ref}
@@ -89,7 +89,7 @@ export function ExactScoresCard({ exactScores, totalFinished }: ExactScoresCardP
           {/* Chiffre central */}
           <p
             ref={numberRef}
-            className="relative text-6xl md:text-7xl font-black tabular-nums"
+            className="relative text-6xl md:text-[5vw] font-black tabular-nums"
             style={{
               background: "linear-gradient(135deg, #84cc16, #65a30d)",
               WebkitBackgroundClip: "text",

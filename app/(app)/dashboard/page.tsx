@@ -84,8 +84,7 @@ const [
 
             {/* TITRE */}
             <div className="relative">
-              <p className="text-xs uppercase tracking-widest text-accent mb-3 flex items-center gap-2">
-                <Trophy size={14} weight="fill" />
+              <p className="text-xs uppercase tracking-widest text-lime mb-3 flex items-center gap-2">
                 Phase en cours
               </p>
               <h2 className="text-4xl md:text-5xl font-black text-text-primary leading-tight mb-2">
@@ -110,7 +109,7 @@ const [
                       className={`
                         rounded-xl border p-4 transition-colors
                         ${hasPrediction
-                          ? "bg-accent/25 border-accent/30"
+                          ? "bg-lime-500/10 border-lime-500/20"
                           : "bg-black/30 border-white/10"
                         }
                       `}
@@ -134,7 +133,7 @@ const [
                           Mon prono
                         </span>
                         {hasPrediction ? (
-                          <span className="text-sm font-bold text-accent tabular-nums">
+                          <span className="text-sm font-bold text-white tabular-nums">
                             {match.myHomePrediction} - {match.myAwayPrediction}
                           </span>
                         ) : (
@@ -159,7 +158,7 @@ const [
               </div>
               <Link
                 href="/matchs"
-                className="inline-flex items-center justify-center gap-2 bg-accent text-bg px-6 py-3 rounded-lg font-semibold hover:bg-accent-hover transition-colors group shrink-0"
+                className="inline-flex items-center justify-center gap-2 bg-lime-500 text-neutral-800 px-6 py-3 rounded-lg font-semibold hover:bg-lime-300 hover:text-neutral-950 transition-colors group shrink-0"
               >
                 Pronostiquer
                 <ArrowRight size={18} weight="bold" className="group-hover:translate-x-0.5 transition-transform" />
@@ -244,7 +243,7 @@ const [
               </div>
               <Link
                 href="/classement"
-                className="text-sm text-accent hover:underline flex items-center gap-1"
+                className="text-sm text-lime hover:text-lime-300 flex items-center gap-1"
               >
                 Voir tout
                 <ArrowRight size={14} weight="bold" />
@@ -263,14 +262,14 @@ const [
                     className={`
                       flex items-center gap-4 px-3 py-2.5 rounded-lg transition-colors
                       ${player.isMe
-                        ? "bg-accent/10 border border-accent/20"
+                        ? "bg-lime/10 border border-lime/20"
                         : "hover:bg-white/[0.02]"
                       }
                     `}
                   >
                     <span className={`
                       text-sm font-bold w-6 shrink-0
-                      ${player.isMe ? "text-accent" : "text-text-muted"}
+                      ${player.isMe ? "text-lime" : "text-text-muted"}
                     `}>
                       {player.position}.
                     </span>
@@ -287,13 +286,13 @@ const [
                     `}>
                       {player.username}
                       {player.isMe && (
-                        <span className="text-accent ml-2 text-xs">●</span>
+                        <span className="text-lime ml-2 text-xs">●</span>
                       )}
                     </span>
 
                     <span className={`
                       text-sm font-bold shrink-0
-                      ${player.isMe ? "text-accent" : "text-text-primary"}
+                      ${player.isMe ? "text-lime" : "text-text-primary"}
                     `}>
                       {player.points}
                       <span className="text-text-muted text-xs font-normal ml-1">pts</span>
@@ -369,80 +368,8 @@ const [
           </div>
 
         </div>
-        <div className="grid grid-cols-12">
-                    {/* MATCHS À PRONOSTIQUER */}
-          <div className=" lg:col-span-5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
-                  À venir
-                </p>
-                <h3 className="text-xl font-bold text-text-primary">
-                  Matchs à pronostiquer
-                </h3>
-              </div>
-              <Link
-                href="/matchs"
-                className="text-sm text-accent hover:underline flex items-center gap-1"
-              >
-                Voir tout
-                <ArrowRight size={14} weight="bold" />
-              </Link>
-            </div>
-
-            <div className="space-y-3 ">
-{upcomingMatches.length === 0 ? (
-                <p className="text-sm text-text-muted text-center py-4">
-                  Aucun match à venir
-                </p>
-              ) : (
-                upcomingMatches.map((match) => {
-                  const hasPrediction =
-                    match.myHomePrediction !== null && match.myAwayPrediction !== null
-
-                  return (
-                    <div
-                      key={match.id}
-                      className="flex items-center justify-center gap-3 py-3 border-b border-white/5 last:border-b-0"
-                    >
-                      {/* Équipes */}
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="text-sm font-medium text-text-primary truncate">
-                          {match.homeTeamName}
-                        </span>
-                      </div>
-
-                      <div className="px-2 text-xs text-text-muted">vs</div>
-
-                      <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-                        <span className="text-sm font-medium text-text-primary truncate text-right">
-                          {match.awayTeamName}
-                        </span>
-                      </div>
-
-                      {/* Mon prono */}
-                      <div className="shrink-0 text-sm font-bold tabular-nums w-16 text-right">
-                        {hasPrediction ? (
-                          <span className="text-accent">
-                            {match.myHomePrediction} - {match.myAwayPrediction}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-text-muted italic">À faire</span>
-                        )}
-                      </div>
-
-                      {/* Date */}
-                      <div className="ml-3 text-xs text-text-muted text-right shrink-0 hidden sm:block">
-                        <p>{match.kickoffDate.split(" ")[0]}</p>
-                        <p className="text-text-secondary font-medium">{match.kickoffTime}</p>
-                      </div>
-                    </div>
-                  )
-                })
-              )}
-            </div>
-          </div>
-        </div>
+        
+       
 
       </div>
     </div>

@@ -62,11 +62,47 @@ export async function getProfileStats(userId: string) {
     }).format(d)
   }
 
+// Réussite et scores exacts
+  const finishedPredictions = await prisma.prediction.findMany({
+    where: {
+      userId,
+      match: { status: "FINISHED" },
+    },
+    select: {
+      homeScore: true,
+      awayScore: true,
+      pointsEarned: true,
+      match: {
+        select: {
+          homeScore: true,
+          awayScore: true,
+        },
+      },
+    },
+  })
+
+  const exactScores = finishedPredictions.filter(
+    (p) =>
+      p.homeScore === p.match.homeScore && p.awayScore === p.match.awayScore
+  ).length
+
+  const goodResults = finishedPredictions.filter(
+    (p) => (p.pointsEarned ?? 0) > 0
+  ).length
+
+  const successRate =
+    finishedPredictions.length > 0
+      ? Math.round((goodResults / finishedPredictions.length) * 100)
+      : 0
+
   return {
     position,
     totalPlayers,
     predictionsMade,
     bestScore,
     bestDayLabel,
+    exactScores,
+    successRate,
+    finishedCount: finishedPredictions.length,
   }
 }

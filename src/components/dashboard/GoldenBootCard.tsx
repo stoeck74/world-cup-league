@@ -45,9 +45,9 @@ export function GoldenBootCard({ initialPicks, isLocked }: GoldenBootCardProps) 
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <SoccerBall size={24} weight="fill" className="text-accent" />
+
             <h3 className="text-sm font-bold uppercase tracking-widest text-text-primary">
-              Meilleurs <span className="text-accent">Buteurs</span>
+              Meilleurs <span className="text-lime">Buteurs</span>
             </h3>
           </div>
           {isLocked && (
@@ -87,9 +87,9 @@ export function GoldenBootCard({ initialPicks, isLocked }: GoldenBootCardProps) 
 
 {/* Explication des règles */}
         <p className="mt-4 pt-4 border-t border-white/5 text-xs text-text-muted leading-relaxed">
-          Pronostique le <span className="text-accent">top 3</span> des meilleurs buteurs du tournoi.
-          <span className="text-accent"> +15 pts</span> par joueur dans le top 3,{" "}
-          <span className="text-accent">+5 pts bonus </span> si il est à la bonne place.
+          Pronostique le <span className="text-lime">top 3</span> des meilleurs buteurs du tournoi.
+          <span className="text-lime"> +15 pts</span> par joueur dans le top 3,{" "}
+          <span className="text-lime">+5 pts bonus </span> si il est à la bonne place.
         </p>
       </div>
 
@@ -115,7 +115,7 @@ function PickRow({ rank, pick }: { rank: 1 | 2 | 3; pick: PlayerPick | null }) {
   const rankLabel = rank === 1 ? "1er" : rank === 2 ? "2e" : "3e"
   const rankColor =
     rank === 1
-      ? "text-accent"
+      ? "text-lime"
       : rank === 2
       ? ""
       : "text-text-muted"
@@ -257,7 +257,7 @@ function GoldenBootModal({
               <Trophy size={20} weight="fill" className="text-accent" />
             </div>
             <h2 className="text-xl font-bold text-white">
-              Top 3 Soulier d&apos;Or
+              Top 3 des meilleurs buteurs
             </h2>
           </div>
           <button
