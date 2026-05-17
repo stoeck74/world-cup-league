@@ -33,6 +33,7 @@ export function MatchPredictionModal({
   onPredictionChange,
   onLeaveCard,
   onClose,
+  onReset,
 }: MatchPredictionModalProps) {
   // ESC pour fermer
   useEffect(() => {
@@ -79,6 +80,7 @@ export function MatchPredictionModal({
           stageStatus="current"
           onPredictionChange={onPredictionChange}
           onLeaveCard={onLeaveCard}
+          onReset={onReset}
           justSaved={justSaved}
           isSaved={isSaved}
         />

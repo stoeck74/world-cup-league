@@ -89,7 +89,7 @@ export function ExactScoresCard({ exactScores, totalFinished }: ExactScoresCardP
           {/* Chiffre central */}
           <p
             ref={numberRef}
-            className="relative text-6xl md:text-[5vw] font-black tabular-nums"
+            className="relative text-6xl md:text-[4.5vw] font-black tabular-nums"
             style={{
               background: "linear-gradient(135deg, #84cc16, #65a30d)",
               WebkitBackgroundClip: "text",

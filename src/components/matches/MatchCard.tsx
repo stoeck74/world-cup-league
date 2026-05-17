@@ -38,11 +38,15 @@ export function MatchCard({
   isSaved = false,
 }: MatchCardProps) {
   const handleHomeChange = (value: number | null) => {
-    onPredictionChange(match.id, value, awayPrediction, qualifierPrediction)
+    // Si on touche home et que away est null, on initialise away à 0 pour avoir un prono cohérent
+    const safeAway = awayPrediction ?? (value !== null ? 0 : null)
+    onPredictionChange(match.id, value, safeAway, qualifierPrediction)
   }
 
   const handleAwayChange = (value: number | null) => {
-    onPredictionChange(match.id, homePrediction, value, qualifierPrediction)
+    // Idem inverse : si on touche away, on init home à 0 si null
+    const safeHome = homePrediction ?? (value !== null ? 0 : null)
+    onPredictionChange(match.id, safeHome, value, qualifierPrediction)
   }
 
   const handleQualifierClick = (tla: string, e: React.MouseEvent) => {
