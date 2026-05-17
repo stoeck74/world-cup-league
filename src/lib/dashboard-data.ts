@@ -97,6 +97,7 @@ export async function getUserStats(userId: string) {
   return {
     totalPoints,
     predictionsMade: predictions.length,
+    finishedPredictions: finishedPredictions.length,
     exactScores,
     goodResults,
     successRate,
@@ -209,30 +210,24 @@ export async function getMyLastResults(userId: string, limit = 5) {
  * Info sur la phase en cours (ou prochaine).
  */
 export async function getCurrentStage(userId: string) {
+  // Ordre des stages
+  // Ordre des stages
+  const stageOrder = [
+    "GROUP",
+    "ROUND_32",
+    "ROUND_16",
+    "QUARTER",
+    "SEMI",
+    "THIRD_PLACE",
+    "FINAL",
+  ] as const
+
   // Trouve le prochain match SCHEDULED
   const nextMatch = await prisma.match.findFirst({
     where: { status: "SCHEDULED" },
     orderBy: { kickoffAt: "asc" },
     select: { stage: true, kickoffAt: true },
   })
-
-  // Compte total matchs du tournoi
-  const totalMatches = await prisma.match.count()
-
-  // Compte les pronos du user
-  const predictionsMade = await prisma.prediction.count({
-    where: { userId },
-  })
-
-  if (!nextMatch) {
-    return {
-      label: "Tournoi terminé",
-      startDate: "",
-      startTime: "",
-      predictionsMade,
-      matchesCount: totalMatches,
-    }
-  }
 
   // Map stage → label
   const stageLabels: Record<string, string> = {
@@ -244,6 +239,39 @@ export async function getCurrentStage(userId: string) {
     THIRD_PLACE: "Petite finale",
     FINAL: "Finale",
   }
+
+  // Tournoi terminé
+  if (!nextMatch) {
+    const totalMatches = await prisma.match.count()
+    const predictionsMade = await prisma.prediction.count({ where: { userId } })
+    return {
+      label: "Tournoi terminé",
+      startDate: "",
+      startTime: "",
+      predictionsMade,
+      matchesCount: totalMatches,
+    }
+  }
+
+  // Stages "ouvertes" = stage actuel + toutes les stages précédentes
+  const currentStageIndex = stageOrder.indexOf(nextMatch.stage)
+  const openedStages = stageOrder.slice(0, currentStageIndex + 1)
+
+  // Compte uniquement les matchs des stages ouvertes
+  const openedMatches = await prisma.match.findMany({
+    where: { stage: { in: openedStages } },
+    select: { id: true },
+  })
+  const openedMatchIds = openedMatches.map((m) => m.id)
+  const matchesCount = openedMatchIds.length
+
+  // Pronos faits SUR ces matchs uniquement
+  const predictionsMade = await prisma.prediction.count({
+    where: {
+      userId,
+      matchId: { in: openedMatchIds },
+    },
+  })
 
   const stageLabel = stageLabels[nextMatch.stage] ?? "Tournoi"
   const startDate = nextMatch.kickoffAt.toLocaleDateString("fr-FR", {
@@ -258,17 +286,12 @@ export async function getCurrentStage(userId: string) {
     timeZone: "Europe/Paris",
   })
 
-  // Compte les matchs de cette stage
-  const stageMatchesCount = await prisma.match.count({
-    where: { stage: nextMatch.stage },
-  })
-
   return {
     label: stageLabel,
     startDate: formattedDate,
     startTime,
     predictionsMade,
-    matchesCount: stageMatchesCount,
+    matchesCount,
   }
 }
 

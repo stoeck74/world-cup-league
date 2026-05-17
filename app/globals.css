@@ -96,19 +96,19 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: brightness(0.4);  
+  filter: brightness(0.4); 
 }
 
 
-.bg-register {
+.bg-register { 
   position: relative;
-  isolation: isolate;
+  isolation: isolate; 
 }
 
 .bg-register::before {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 0; 
   z-index: -1;
   background-image: url('/register.webp');
   background-size: cover;
@@ -118,8 +118,9 @@ body {
 }
 
 .bg-dashboard {
-  position: relative;
-  isolation: isolate;
+  position: relative; 
+  isolation: isolate; 
+
 }
 
 .bg-dashboard::before {
@@ -131,7 +132,7 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter:brightness(0.8) contrast(1.1); 
+  filter:brightness(0.4) contrast(1); 
 }
 
 

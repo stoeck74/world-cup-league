@@ -5,6 +5,11 @@ import { DashboardChart } from "@/components/dashboard/DashboardChart"
 import { PositionPop } from "@/components/dashboard/PositionPop"
 import { getUserGoldenBootPredictions, getGoldenBootStatus } from "@/lib/actions/golden-boot"
 import { GoldenBootCard } from "@/components/dashboard/GoldenBootCard"
+import { HeroProgressBar } from "@/components/dashboard/HeroProgressBar"
+import { SuccessRateCard } from "@/components/dashboard/SuccessRateCard"
+import { ExactScoresCard } from "@/components/dashboard/ExactScoresCard"
+
+
 
 import {
   getCurrentStage,
@@ -50,11 +55,11 @@ const [
 ])
   return (
     <div className="relative bg-dashboard h-full p-4 md:p-6 lg:p-8 overflow-hidden">
-      <div className="max-w-[1400px] mx-auto">
+      <div className="max-w-[1600px] mx-auto">
 
         {/* Halos décoratifs */}
-        <div className="absolute top-0 left-0 w-[800px] h-[500px] bg-accent/20 rounded-full blur-[120px] pointer-events-none -translate-x-1/3 -translate-y-1/3" />
-        <div className="absolute bottom-0 right-0 w-[1500px] h-[700px] bg-accent/25 rounded-full blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
+        <div className="absolute top-0 right-0 w-[1300px] h-[1000px] bg-lime-500/25 rounded-full blur-[300px] pointer-events-none -translate-y-1/3" />
+        <div className="absolute bottom-0 right-0 w-[1500px] h-[1000px] bg-lime-500/25 rounded-full blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
 
         {/* Header */}
         <header className="mb-8 relative">
@@ -105,7 +110,7 @@ const [
                       className={`
                         rounded-xl border p-4 transition-colors
                         ${hasPrediction
-                          ? "bg-accent/10 border-accent/30"
+                          ? "bg-accent/25 border-accent/30"
                           : "bg-black/30 border-white/10"
                         }
                       `}
@@ -144,20 +149,17 @@ const [
               </div>
             )}
 
-            {/* FOOTER — Pronostics + bouton */}
-            <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-              <div>
-                <p className="text-xs text-text-muted mb-1">Pronostics</p>
-                <p className="text-2xl font-bold text-text-primary">
-                  {currentStage.predictionsMade}
-                  <span className="text-text-muted text-lg font-normal">
-                    {" / "}{currentStage.matchesCount} matchs
-                  </span>
-                </p>
+ {/* FOOTER — Progress bar + bouton */}
+            <div className="relative flex flex-col sm:flex-row sm:items-end sm:gap-6 gap-4">
+              <div className="flex-1">
+                <HeroProgressBar
+                  predictionsMade={currentStage.predictionsMade}
+                  matchesCount={currentStage.matchesCount}
+                />
               </div>
               <Link
                 href="/matchs"
-                className="inline-flex items-center justify-center gap-2 bg-accent text-bg px-6 py-3 rounded-lg font-semibold hover:bg-accent-hover transition-colors group"
+                className="inline-flex items-center justify-center gap-2 bg-accent text-bg px-6 py-3 rounded-lg font-semibold hover:bg-accent-hover transition-colors group shrink-0"
               >
                 Pronostiquer
                 <ArrowRight size={18} weight="bold" className="group-hover:translate-x-0.5 transition-transform" />
@@ -165,115 +167,53 @@ const [
             </div>
           </div>
 
-          {/* CARD POSITION */}
-          <div className="lg:col-span-4 rounded-2xl bg-accent border border-accent/10 backdrop-blur-sm p-8 flex flex-col justify-between min-h-[260px]">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-text-accent mb-3">
-                Ma position
-              </p>
-<PositionPop
-              position={position.position}
-              totalPlayers={position.totalPlayers}
-              points={position.points}
-              gapToLeader={position.gapToLeader}
-              isLeader={position.isLeader}
-              pointsLastStage={pointsLastStage}
-              predictionsMade={currentStage.predictionsMade}
-              totalMatches={currentStage.matchesCount}
+ {/* CARD POSITION — minimaliste */}
+<div className="lg:col-span-4 relative overflow-hidden rounded-2xl bg-gradient-to-br from-lime-300 to-lime-500 border border-lime-800/50 backdrop-blur-sm p-6 md:p-8 flex flex-col">
+
+
+  {/* Halos décoratifs */}
+  <div className="absolute -top-20 -right-20 w-64 h-64 bg-lime-200/70 rounded-full blur-3xl pointer-events-none" />
+  <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-lime-600/80 rounded-full blur-3xl pointer-events-none" />
+
+  <p className="relative text-xs uppercase tracking-widest text-neutral-900 mb-4">
+    Ma position
+  </p>
+  <div className="relative flex-1 min-h-[200px]">
+    <PositionPop
+      position={position.position}
+      totalPlayers={position.totalPlayers}
+    />
+  </div>
+</div>
+
+ </div>
+
+{/* Ligne 2 — Réussite + Exacts + Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative items-stretch">
+
+          <div className="lg:col-span-3 h-full">
+            <SuccessRateCard
+              goodResults={stats.goodResults}
+              totalFinished={stats.finishedPredictions}
             />
-              <p className="text-sm text-text-secondary mt-2">
-                sur {position.totalPlayers} joueur{position.totalPlayers > 1 ? "s" : ""}
-              </p>
-            </div>
-
-            <div className="pt-4 border-t border-white/5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-secondary mb-1">Total points</p>
-                  <p className="text-3xl font-bold text-text-primary">
-                    {position.points}
-                  </p>
-                </div>
-                {pointsLastStage > 0 && (
-                  <div className="flex items-center gap-1.5 text-text-accent text-sm font-semibold">
-                    <TrendUp size={16} weight="bold" />
-                    +{pointsLastStage}
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
-        </div>
-
-        {/* Ligne 2 — Graph + Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative">
-
-          {/* MES STATS */}
-          <div className="lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm p-6 md:p-8">
-            <div className="mb-6">
-              <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
-                Mondial 2026
-              </p>
-              <h3 className="text-xl font-bold text-text-primary">
-                Mes statistiques
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-black/20 border border-white/5 p-4">
-                <p className="text-xs uppercase tracking-widest text-text-muted mb-2">
-                  Total points
-                </p>
-                <p className="text-3xl font-black text-text-primary">
-                  {stats.totalPoints}
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-black/20 border border-white/5 p-4">
-                <p className="text-xs uppercase tracking-widest text-text-muted mb-2">
-                  Réussite
-                </p>
-                <p className="text-3xl font-black text-accent">
-                  {stats.successRate}<span className="text-xl">%</span>
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-black/20 border border-white/5 p-4">
-                <p className="text-xs uppercase tracking-widest text-text-muted mb-2">
-                  Scores exacts
-                </p>
-                <p className="text-3xl font-black text-text-primary">
-                  {stats.exactScores}
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-black/20 border border-white/5 p-4">
-                <p className="text-xs uppercase tracking-widest text-text-muted mb-2">
-                  Bons résultats
-                </p>
-                <p className="text-3xl font-black text-text-primary">
-                  {stats.goodResults}
-                </p>
-              </div>
-            </div>
+          <div className="lg:col-span-3 h-full">
+            <ExactScoresCard
+              exactScores={stats.exactScores}
+              totalFinished={stats.finishedPredictions}
+            />
           </div>
 
-
-
-
-          {/* GRAPH (à adapter en V2 pour la CDM) */}
-          <div className="lg:col-span-8 min-w-0">
+          <div className="lg:col-span-6 min-w-0 h-full">
             <DashboardChart data={chartData} />
           </div>
-
-
 
         </div>
 
         {/* Ligne 3 — Matchs à venir + Top + Derniers résultats */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative">
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-3">
           <GoldenBootCard
  initialPicks={
             goldenBootPredictions.ok && goldenBootPredictions.predictions
@@ -365,7 +305,7 @@ const [
           </div>
 
           {/* DERNIERS RÉSULTATS */}
-          <div className="lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm p-6 md:p-8 relative">
+          <div className="lg:col-span-5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8 relative">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
@@ -431,7 +371,7 @@ const [
         </div>
         <div className="grid grid-cols-12">
                     {/* MATCHS À PRONOSTIQUER */}
-          <div className=" lg:col-span-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm p-6 md:p-8">
+          <div className=" lg:col-span-5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
@@ -451,38 +391,54 @@ const [
             </div>
 
             <div className="space-y-3 ">
-              {upcomingMatches.length === 0 ? (
+{upcomingMatches.length === 0 ? (
                 <p className="text-sm text-text-muted text-center py-4">
                   Aucun match à venir
                 </p>
               ) : (
-                upcomingMatches.map((match) => (
-                  <div
-                    key={match.id}
-                    className="flex items-center justify-center py-3 border-b border-white/5 last:border-b-0"
-                  >
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                upcomingMatches.map((match) => {
+                  const hasPrediction =
+                    match.myHomePrediction !== null && match.myAwayPrediction !== null
 
-                      <span className="text-sm font-medium text-text-primary truncate">
-                        {match.homeTeamName}
-                      </span>
+                  return (
+                    <div
+                      key={match.id}
+                      className="flex items-center justify-center gap-3 py-3 border-b border-white/5 last:border-b-0"
+                    >
+                      {/* Équipes */}
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <span className="text-sm font-medium text-text-primary truncate">
+                          {match.homeTeamName}
+                        </span>
+                      </div>
+
+                      <div className="px-2 text-xs text-text-muted">vs</div>
+
+                      <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
+                        <span className="text-sm font-medium text-text-primary truncate text-right">
+                          {match.awayTeamName}
+                        </span>
+                      </div>
+
+                      {/* Mon prono */}
+                      <div className="shrink-0 text-sm font-bold tabular-nums w-16 text-right">
+                        {hasPrediction ? (
+                          <span className="text-accent">
+                            {match.myHomePrediction} - {match.myAwayPrediction}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-text-muted italic">À faire</span>
+                        )}
+                      </div>
+
+                      {/* Date */}
+                      <div className="ml-3 text-xs text-text-muted text-right shrink-0 hidden sm:block">
+                        <p>{match.kickoffDate.split(" ")[0]}</p>
+                        <p className="text-text-secondary font-medium">{match.kickoffTime}</p>
+                      </div>
                     </div>
-
-                    <div className="px-2 text-xs text-text-muted">vs</div>
-
-                    <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-                      <span className="text-sm font-medium text-text-primary truncate text-right">
-                        {match.awayTeamName}
-                      </span>
-
-                    </div>
-
-                    <div className="ml-3 text-xs text-text-muted text-right shrink-0 hidden sm:block">
-                      <p>{match.kickoffDate.split(" ")[0]}</p>
-                      <p className="text-text-secondary font-medium">{match.kickoffTime}</p>
-                    </div>
-                  </div>
-                ))
+                  )
+                })
               )}
             </div>
           </div>
