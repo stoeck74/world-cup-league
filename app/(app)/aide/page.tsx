@@ -110,6 +110,43 @@ export default async function AidePage() {
           </div>
         </section>
 
+
+        {/* ============================================
+            SECTION 2 bis — Le Soulier d'Or
+            ============================================ */}
+        <section className="mb-16">
+          <div className="mb-8">
+            <p className="text-xs uppercase tracking-widest text-text-muted mb-2">
+              Bonus
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-text-primary">
+              Les meilleurs <span className="text-accent">Buteurs</span>
+            </h2>
+          </div>
+
+          <div className="rounded-2xl bg-black/35 backdrop-blur-xl backdrop-saturate-150 border border-white/10 p-6 md:p-8 space-y-4">
+            <p className="text-text-secondary leading-relaxed">
+              Avant le coup d&apos;envoi du tournoi, choisis les <span className="text-text-primary font-semibold">3 joueurs</span> que tu penses voir terminer en tête du classement des buteurs. Une fois le premier match lancé, ton choix est <span className="text-text-primary font-semibold">figé</span>.
+            </p>
+            <p>Cette fonction est accessible depuis ton dashboard.</p>
+
+            <div className="pt-4 border-t border-white/5 space-y-2">
+              <p className="text-text-secondary">
+                <span className="text-accent font-bold">+15 pts</span> par joueur dans le top 3 final.
+              </p>
+              <p className="text-text-secondary">
+                <span className="text-accent font-bold">+5 pts bonus</span> si le joueur est pile à la bonne position (1er, 2e ou 3e).
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-white/5">
+              <p className="text-text-muted text-sm">
+                Trouver les 3 buteurs pile à la bonne place : <span className="text-text-primary font-bold">60 pts</span> 🎯
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* ============================================
             SECTION 3 — Le calendrier
             ============================================ */}

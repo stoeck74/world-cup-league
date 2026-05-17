@@ -289,9 +289,9 @@ const handleResetPrediction = (matchId: string) => {
 
         <div ref={contentRef}>
           {mainTab === "POULES" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 max-w-[1400px] mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-[1400px] mx-auto">
               {displayedMatches.length === 0 ? (
-                <div className="col-span-full rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-12 text-center text-text-muted">
+                <div className="col-span-full rounded-2xl bg-white/[0.03] border border-white/10 p-12 text-center text-text-muted">
                   Aucun match disponible pour ce groupe
                 </div>
               ) : (
@@ -317,21 +317,6 @@ const handleResetPrediction = (matchId: string) => {
                     />
                   )
 
-
-
-                  return (
-                    <MatchCard
-                      key={match.id}
-                      match={match}
-                      homePrediction={prediction.home}
-                      awayPrediction={prediction.away}
-                      qualifierPrediction={prediction.qualifier}
-                      stageStatus="current"
-                      onPredictionChange={handlePredictionChange}
-                      onLeaveCard={handleLeaveCard}
-                      justSaved={justSavedIds.has(match.id)}
-                    />
-                  )
                 })
               )}
             </div>

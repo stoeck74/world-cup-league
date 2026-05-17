@@ -78,7 +78,7 @@ export function MatchCard({
       onClick={handleCardClick}
       onMouseLeave={() => onLeaveCard?.(match.id)}
       className={`
-        relative rounded-2xl border backdrop-blur-xl overflow-hidden transition-all
+        relative rounded-2xl border backdrop-blur-sm overflow-hidden transition-all
         ${isMissingQualifier
           ? "bg-orange-500/[0.06] border-orange-500/40"
           : "bg-white/[0.03] border-white/10"

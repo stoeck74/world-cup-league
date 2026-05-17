@@ -71,10 +71,10 @@ const [
         </header>
 
         {/* Ligne 1 — Hero (phase actuelle) + Position */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative lg:mt-64">
 
 {/* HERO CARD — Phase en cours + 3 prochains matchs */}
-          <div className="lg:col-span-8 relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-8 flex flex-col justify-between gap-6">
+          <div className="lg:col-span-8 relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm p-8 flex flex-col justify-between gap-6">
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* TITRE */}
@@ -166,7 +166,7 @@ const [
           </div>
 
           {/* CARD POSITION */}
-          <div className="lg:col-span-4 rounded-2xl bg-accent border border-accent/10 backdrop-blur-xl p-8 flex flex-col justify-between min-h-[260px]">
+          <div className="lg:col-span-4 rounded-2xl bg-accent border border-accent/10 backdrop-blur-sm p-8 flex flex-col justify-between min-h-[260px]">
             <div>
               <p className="text-xs uppercase tracking-widest text-text-accent mb-3">
                 Ma position
@@ -210,7 +210,7 @@ const [
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative">
 
           {/* MES STATS */}
-          <div className="lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
+          <div className="lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm p-6 md:p-8">
             <div className="mb-6">
               <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
                 Mondial 2026
@@ -273,7 +273,7 @@ const [
 
         {/* Ligne 3 — Matchs à venir + Top + Derniers résultats */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative">
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-4">
           <GoldenBootCard
  initialPicks={
             goldenBootPredictions.ok && goldenBootPredictions.predictions
@@ -292,7 +292,7 @@ const [
 
 
           {/* TOP CLASSEMENT */}
-          <div className=" lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
+          <div className=" lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm p-6 md:p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
@@ -365,7 +365,7 @@ const [
           </div>
 
           {/* DERNIERS RÉSULTATS */}
-          <div className="lg:col-span-5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8 relative">
+          <div className="lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm p-6 md:p-8 relative">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
@@ -431,7 +431,7 @@ const [
         </div>
         <div className="grid grid-cols-12">
                     {/* MATCHS À PRONOSTIQUER */}
-          <div className=" lg:col-span-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
+          <div className=" lg:col-span-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm p-6 md:p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-text-muted mb-1">

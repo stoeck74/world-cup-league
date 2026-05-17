@@ -85,12 +85,11 @@ export function GoldenBootCard({ initialPicks, isLocked }: GoldenBootCardProps) 
           </p>
         )}
 
-        {/* Explication */}
+{/* Explication des règles */}
         <p className="mt-4 pt-4 border-t border-white/5 text-xs text-text-muted leading-relaxed">
-          Pronostique le <span className="text-text-secondary">top 3</span> des meilleurs buteurs du tournoi.
-          <br />
-          <span className="text-text-secondary">+30 pts</span> pour le bon 1er,{" "}
-          <span className="text-text-secondary">+10/+5/+5</span> pour chaque buteur dans le top 3.
+          Pronostique le <span className="text-accent">top 3</span> des meilleurs buteurs du tournoi.
+          <span className="text-accent"> +15 pts</span> par joueur dans le top 3,{" "}
+          <span className="text-accent">+5 pts bonus </span> si il est à la bonne place.
         </p>
       </div>
 

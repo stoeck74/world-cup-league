@@ -1,6 +1,7 @@
 import { auth } from "@/../auth"
 import { prisma } from "@/lib/prisma"
 import { getUserPastPredictions, getUserUpcomingPredictions } from "@/lib/dashboard-data"
+import { getProfileStats } from "@/lib/profile-data"
 import { notFound } from "next/navigation"
 import { Pencil, Trophy, Lightning, Target } from "@phosphor-icons/react/dist/ssr"
 import { EditableField } from "@/components/profile/EditableField"
@@ -78,15 +79,22 @@ const allTeams = await prisma.team.findMany({
     year: "numeric",
   }).format(new Date(user.createdAt))
 
+// ============================================
+  // STATS — Vraies données
   // ============================================
-  // STATS — Placeholder pour V1
-  // ============================================
+  const rawStats = await getProfileStats(user.id)
+
+  // Format "1er" / "2e" / "3e" pour l'affichage
+  const positionLabel = rawStats.position === 1
+    ? "1er"
+    : `${rawStats.position}e`
+
   const stats = {
-    position: "3e",
-    totalPlayers: 8,
-    predictionsMade: 24,
-    bestScore: 6,
-    bestMatchday: 18,
+    position: positionLabel,
+    totalPlayers: rawStats.totalPlayers,
+    predictionsMade: rawStats.predictionsMade,
+    bestScore: rawStats.bestScore,
+    bestDayLabel: rawStats.bestDayLabel,
   }
 
   return (
@@ -192,17 +200,23 @@ const allTeams = await prisma.team.findMany({
                   Meilleur
                 </p>
               </div>
-              <p className="text-2xl md:text-3xl font-black text-accent">
-                +{stats.bestScore}
-                <span className="text-text-muted text-sm font-normal ml-1">
-                  J{stats.bestMatchday}
-                </span>
-              </p>
+              {stats.bestScore > 0 ? (
+                <p className="text-2xl md:text-3xl font-black text-accent">
+                  +{stats.bestScore}
+                  <span className="text-text-muted text-sm font-normal ml-1">
+                    {stats.bestDayLabel}
+                  </span>
+                </p>
+              ) : (
+                <p className="text-lg md:text-xl font-bold text-text-muted">
+                  —
+                </p>
+              )}
             </div>
 
 </section>
 
-<section className="py-12">
+<section className="py-8">
 {goldenBootPredictions.ok && goldenBootPredictions.predictions && (
   <ProfileGoldenBoot
     picks={{
