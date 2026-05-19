@@ -45,12 +45,14 @@ export function SuccessRateCard({ goodResults, totalFinished }: SuccessRateCardP
   }, [percent, targetOffset, circumference])
 
   return (
-    <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8 flex flex-col h-full">
+    <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8 flex flex-col h-full overflow-hidden">
+      <div className="absolute -bottom-1/3 -right-0 w-full h-1/2 bg-accent/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-1/3 left-1/4 w-1/2 h-1/4 bg-blue-300 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-1">
-          <ChartDonut size={36} weight="light" className="text-lime" />
+          <ChartDonut size={36} weight="light" className="text-accent" />
           <p className="text-xs uppercase tracking-widest text-text-muted">
             Mondial 2026
           </p>
@@ -70,9 +72,9 @@ export function SuccessRateCard({ goodResults, totalFinished }: SuccessRateCardP
           {/* Définition du gradient */}
           <defs>
             <linearGradient id="donut-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#84cc16" />
-              <stop offset="50%" stopColor="#bef264" />
-              <stop offset="100%" stopColor="#65a30d" />
+              <stop offset="0%" stopColor="#21a9f3" />
+              <stop offset="50%" stopColor="#2196f3" />
+              <stop offset="100%" stopColor="#3cb7fa" />
             </linearGradient>
           </defs>
 
@@ -125,7 +127,7 @@ export function SuccessRateCard({ goodResults, totalFinished }: SuccessRateCardP
 
       {/* Footer — détail */}
       <div className="pt-4 border-t border-white/5 text-center">
-        <p className="text-xs uppercase tracking-widest text-text-muted">
+        <p className="text-xs uppercase tracking-widest text-neutral-300">
           {totalFinished > 0
             ? `${goodResults} / ${totalFinished} matchs`
             : "Pas encore de matchs joués"}

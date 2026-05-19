@@ -56,8 +56,11 @@ function GroupCard({ group }: { group: FakeGroup }) {
   return (
     <div
       data-group-card
-      className="rounded-2xl bg-gradient-to-br from-indigo-500/20 to-blue-500/40 backdrop-blur-xl p-4 md:p-5" 
+      className="" 
     >
+     <div className="rounded-2xl bg-white/3 border border-white/10 backdrop-blur-xl p-6 md:p-8 flex flex-col h-full overflow-hidden">
+      <div className="absolute -bottom-1/3 right-0 w-full h-1/2 bg-accent/50 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-1/3 left-1/4 w-1/2 h-1/4 bg-blue-300 rounded-full blur-3xl pointer-events-none" />
       {/* Header : lettre du groupe */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -148,6 +151,7 @@ function GroupCard({ group }: { group: FakeGroup }) {
           Qualifiés 1/16e
         </span>
       </div>
+    </div>
     </div>
   )
 }

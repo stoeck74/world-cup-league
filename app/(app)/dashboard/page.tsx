@@ -57,11 +57,11 @@ const [
 ])
   return (
     <div className="relative bg-dashboard h-full p-4 md:p-6 lg:p-8 overflow-hidden">
-      <div className="max-w-[1600px] mx-auto">
+      <div className="max-w-full mx-auto">
 
         {/* Halos décoratifs */}
-        <div className="absolute top-0 right-0 w-[1300px] h-[1000px] bg-lime-500/25 rounded-full blur-[300px] pointer-events-none -translate-y-1/3" />
-        <div className="absolute bottom-0 right-0 w-[1500px] h-[1000px] bg-lime-500/25 rounded-full blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
+        <div className="absolute top-0 right-0 w-325 h-250 bg-accent/25 rounded-full blur-[300px] pointer-events-none -translate-y-1/3" />
+        <div className="absolute bottom-0 right-0 w-375 h-250 bg-accent/25 rounded-full blur-[100px] pointer-events-none translate-x-1/3 translate-y-1/3" />
 
         {/* Header */}
         <header className="mb-8 relative">
@@ -78,15 +78,15 @@ const [
         </header>
 
         {/* Ligne 1 — Hero (phase actuelle) + Position */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative lg:mt-64">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative mt-6">
 
 {/* HERO CARD — Phase en cours + 3 prochains matchs */}
-          <div className="lg:col-span-8 relative overflow-hidden rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm p-8 flex flex-col justify-between gap-6">
-            <div className="absolute -top-20 -right-20 w-64 h-64 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="lg:col-span-8 relative overflow-hidden rounded-2xl bg-white/3 border border-white/10 backdrop-blur-sm p-8 flex flex-col justify-between gap-6">
+            <div className="absolute -bottom-1/3 right-0 w-full h-1/2 bg-accent/30 rounded-full blur-3xl pointer-events-none" />
 
             {/* TITRE */}
             <div className="relative">
-              <p className="text-xs uppercase tracking-widest text-lime mb-3 flex items-center gap-2">
+              <p className="text-xs uppercase tracking-widest text-accent mb-3 flex items-center gap-2">
                 Phase en cours
               </p>
               <h2 className="text-4xl md:text-5xl font-black text-text-primary leading-tight mb-2">
@@ -111,7 +111,7 @@ const [
                       className={`
                         rounded-xl border p-4 transition-colors
                         ${hasPrediction
-                          ? "bg-lime-500/10 border-lime-500/20"
+                          ? "bg-accent/10 border-accent/20"
                           : "bg-black/30 border-white/10"
                         }
                       `}
@@ -160,7 +160,7 @@ const [
               </div>
               <Link
                 href="/matchs"
-                className="inline-flex items-center justify-center gap-2 bg-lime-500 text-neutral-800 px-6 py-3 rounded-lg font-semibold hover:bg-lime-300 hover:text-neutral-950 transition-colors group shrink-0"
+                className="inline-flex items-center justify-center gap-2 bg-accent text-neutral-200 px-6 py-3 rounded-lg font-semibold hover:bg-accent/90 hover:text-neutral-50 transition-colors group shrink-0"
               >
                 Pronostiquer
                 <ArrowRight size={18} weight="bold" className="group-hover:translate-x-0.5 transition-transform" />
@@ -169,17 +169,17 @@ const [
           </div>
 
  {/* CARD POSITION — minimaliste */}
-<div className="lg:col-span-4 relative overflow-hidden rounded-2xl bg-gradient-to-br from-lime-300 to-lime-500 border border-lime-800/50 backdrop-blur-sm p-6 md:p-8 flex flex-col">
+<div className="lg:col-span-4 relative overflow-hidden rounded-2xl bg-linear-to-br from-accent to-accent/80 border border-accent/50 backdrop-blur-sm p-6 md:p-8 flex flex-col">
 
 
   {/* Halos décoratifs */}
-  <div className="absolute -top-20 -right-20 w-64 h-64 bg-lime-200/70 rounded-full blur-3xl pointer-events-none" />
-  <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-lime-600/80 rounded-full blur-3xl pointer-events-none" />
+  <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-300/70 rounded-full blur-3xl pointer-events-none" />
+  <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-blue-700/80 rounded-full blur-3xl pointer-events-none" />
 
   <p className="relative text-xs uppercase tracking-widest text-neutral-900 mb-4">
     Ma position
   </p>
-  <div className="relative flex-1 min-h-[200px]">
+  <div className="relative flex-1 min-h-50">
     <PositionPop
       position={position.position}
       totalPlayers={position.totalPlayers}
@@ -193,6 +193,8 @@ const [
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 relative items-stretch">
 
           <div className="lg:col-span-3 h-full">
+                        
+
             <SuccessRateCard
               goodResults={stats.goodResults}
               totalFinished={stats.finishedPredictions}
@@ -233,7 +235,8 @@ const [
 
 
           {/* TOP CLASSEMENT */}
-          <div className=" lg:col-span-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm p-6 md:p-8">
+          <div className=" lg:col-span-4 rounded-2xl bg-white/3 border border-white/10 backdrop-blur-sm p-6 md:p-8 overflow-hidden">
+
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
@@ -245,7 +248,7 @@ const [
               </div>
               <Link
                 href="/classement"
-                className="text-sm text-lime hover:text-lime-300 flex items-center gap-1"
+                className="text-sm text-accent hover:text-accent/80 flex items-center gap-1"
               >
                 Voir tout
                 <ArrowRight size={14} weight="bold" />
@@ -264,21 +267,21 @@ const [
                     className={`
                       flex items-center gap-4 px-3 py-2.5 rounded-lg transition-colors
                       ${player.isMe
-                        ? "bg-lime/10 border border-lime/20"
-                        : "hover:bg-white/[0.02]"
+                        ? "bg-accent/10 border border-accent/20"
+                        : "hover:bg-white/2"
                       }
                     `}
                   >
                     <span className={`
                       text-sm font-bold w-6 shrink-0
-                      ${player.isMe ? "text-lime" : "text-text-muted"}
+                      ${player.isMe ? "text-aceent" : "text-text-muted"}
                     `}>
                       {player.position}.
                     </span>
                     <img
                       src={buildAvatarUrl(player.avatarStyle, player.avatarSeed, player.username)}
                       alt={player.username}
-                      className="w-8 h-8 rounded-full bg-lime-500/30 border border-white/10 shrink-0"
+                      className="w-8 h-8 rounded-full bg-accent/30 border border-white/10 shrink-0"
                     />
 
                     <span className={`
@@ -287,13 +290,13 @@ const [
                     `}>
                       {player.username}
                       {player.isMe && (
-                        <span className="text-lime ml-2 text-xs">●</span>
+                        <span className="text-accent ml-2 text-xs">●</span>
                       )}
                     </span>
 
                     <span className={`
                       text-sm font-bold shrink-0
-                      ${player.isMe ? "text-lime" : "text-text-primary"}
+                      ${player.isMe ? "text-accent" : "text-text-primary"}
                     `}>
                       {player.points}
                       <span className="text-text-muted text-xs font-normal ml-1">pts</span>
@@ -305,7 +308,7 @@ const [
           </div>
 
           {/* DERNIERS RÉSULTATS */}
-          <div className="lg:col-span-5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8 relative">
+          <div className="lg:col-span-5 rounded-2xl bg-white/3 border border-white/10 backdrop-blur-xl p-6 md:p-8 relative">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-text-muted mb-1">

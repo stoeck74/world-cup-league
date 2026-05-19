@@ -47,7 +47,7 @@ export function GoldenBootCard({ initialPicks, isLocked }: GoldenBootCardProps) 
           <div className="flex items-center gap-2">
 
             <h3 className="text-sm font-bold uppercase tracking-widest text-text-primary">
-              Meilleurs <span className="text-lime">Buteurs</span>
+              Meilleurs <span className="text-accent">Buteurs</span>
             </h3>
           </div>
           {isLocked && (
@@ -87,9 +87,9 @@ export function GoldenBootCard({ initialPicks, isLocked }: GoldenBootCardProps) 
 
 {/* Explication des règles */}
         <p className="mt-4 pt-4 border-t border-white/5 text-xs text-text-muted leading-relaxed">
-          Pronostique le <span className="text-lime">top 3</span> des meilleurs buteurs du tournoi.
-          <span className="text-lime"> +15 pts</span> par joueur dans le top 3,{" "}
-          <span className="text-lime">+5 pts bonus </span> si il est à la bonne place.
+          Pronostique le <span className="text-accent">top 3</span> des meilleurs buteurs du tournoi.
+          <span className="text-accent"> +15 pts</span> par joueur dans le top 3,{" "}
+          <span className="text-accent">+5 pts bonus </span> si il est à la bonne place.
         </p>
       </div>
 
@@ -115,7 +115,7 @@ function PickRow({ rank, pick }: { rank: 1 | 2 | 3; pick: PlayerPick | null }) {
   const rankLabel = rank === 1 ? "1er" : rank === 2 ? "2e" : "3e"
   const rankColor =
     rank === 1
-      ? "text-lime"
+      ? "text-accent"
       : rank === 2
       ? ""
       : "text-text-muted"

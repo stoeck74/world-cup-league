@@ -52,11 +52,13 @@ export function ExactScoresCard({ exactScores, totalFinished }: ExactScoresCardP
   }, [exactScores])
 
   return (
-    <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8 flex flex-col h-full">
+    <div className="rounded-2xl bg-white/3 border border-white/10 backdrop-blur-xl p-6 md:p-8 flex flex-col h-full overflow-hidden">
+      <div className="absolute -bottom-1/3 right-0 w-full h-1/2 bg-accent/50 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-1/3 left-1/4 w-1/2 h-1/4 bg-blue-300 rounded-full blur-3xl pointer-events-none" />
       {/* Header */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-1">
-          <Target size={36} weight="light" className="text-lime" />
+          <Target size={36} weight="light" className="text-accent" />
           <p className="text-xs uppercase tracking-widest text-text-muted">
             Précision
           </p>
@@ -72,17 +74,17 @@ export function ExactScoresCard({ exactScores, totalFinished }: ExactScoresCardP
           {/* Anneaux */}
           <div
             ref={ring1Ref}
-            className="absolute w-1/2 h-1/2 border-lime-500 rounded-full"
+            className="absolute w-1/2 h-1/2 border-accent rounded-full"
             style={{ opacity: 0 }}
           />
           <div
             ref={ring2Ref}
-            className="absolute w-1/2 h-1/2 border-lime-500 rounded-full"
+            className="absolute w-1/2 h-1/2 border-accent rounded-full"
             style={{ opacity: 0 }}
           />
           <div
             ref={ring3Ref}
-            className="absolute w-1/2 h-1/2 border-lime-500 rounded-full"
+            className="absolute w-1/2 h-1/2 border-accent rounded-full"
             style={{ opacity: 0 }}
           />
 
@@ -91,7 +93,7 @@ export function ExactScoresCard({ exactScores, totalFinished }: ExactScoresCardP
             ref={numberRef}
             className="relative text-6xl md:text-[4.5vw] font-black tabular-nums"
             style={{
-              background: "linear-gradient(135deg, #84cc16, #65a30d)",
+              background: "linear-gradient(135deg, #2196f3, #21a9f3)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -104,7 +106,7 @@ export function ExactScoresCard({ exactScores, totalFinished }: ExactScoresCardP
 
       {/* Footer */}
       <div className="pt-4 border-t border-white/5 text-center">
-        <p className="text-xs uppercase tracking-widest text-text-muted">
+        <p className="text-xs uppercase tracking-widest text-neutral-300">
           {totalFinished > 0
             ? `sur ${totalFinished} pronos joués`
             : "Pas encore de matchs joués"}

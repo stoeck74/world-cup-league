@@ -105,7 +105,7 @@ const teamsMap = new Map<string, { name: string; shortName: string; tla: string;
 
   return (
     <div className="p-4 md:p-6 lg:p-8 bg-results h-screen">
-      <div className="max-w-[1400px] mx-auto">
+      <div className="max-w-fullmx-auto">
         <header className="mb-8">
           <p className="text-xs uppercase tracking-widest text-text-muted mb-2">
             Classements

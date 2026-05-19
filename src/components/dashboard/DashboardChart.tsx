@@ -88,7 +88,7 @@ function CustomTooltip({ active, payload, trend }: TooltipProps) {
       <p className="text-xs uppercase tracking-widest text-text-muted mb-1">
         {data.label}
       </p>
-      <p className="text-2xl font-bold text-lime-500">
+      <p className="text-2xl font-bold text-accent">
         {trend.key === "position" ? `${value}e` : value}
         {(trend.key === "points" || trend.key === "cumulative") && (
           <span className="text-base text-primary ml-1">pts</span>
@@ -109,10 +109,12 @@ export function DashboardChart({ data }: DashboardChartProps) {
   // État vide : pas encore de matchs joués
   if (data.length === 0) {
     return (
-      <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8">
+      <div className="rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl p-6 md:p-8 overflow-hidden">
+        <div className="absolute -bottom-1/3 -right-0 w-full h-1/2 bg-accent/50 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-1/3 left-1/4 w-1/2 h-1/4 bg-blue-300 rounded-full blur-3xl pointer-events-none" />
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
-                    <TrendUp size={36} weight="light" className="text-lime" />
+                    <TrendUp size={36} weight="light" className="text-accent" />
                     <p className="text-xs uppercase tracking-widest text-text-muted">
                       Évolution sur le tournoi
                     </p>
@@ -157,7 +159,7 @@ export function DashboardChart({ data }: DashboardChartProps) {
               className={`
                 px-4 py-2 rounded-md text-sm font-medium transition-colors
                 ${selectedTrend === t.key
-                  ? "bg-lime-600 text-bg"
+                  ? "bg-accent text-bg"
                   : "text-text-secondary hover:text-text-primary"
                 }
               `}
